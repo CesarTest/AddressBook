@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# Redirect to Subfolder
+RewriteBase /
+RewriteRule ^index.(.*)?$ http://%{SERVER_NAME}/cesar_delgado/src/ [r=301]

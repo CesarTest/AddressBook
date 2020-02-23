@@ -1,0 +1,13 @@
+monolog:
+    handlers:
+        syslog:
+            type: stream
+            path: /var/log/cesar.log
+            level: error
+        main:
+            type: fingers_crossed
+            action_level: warning
+            handler: file
+        file:
+            type: stream
+            level: debug
