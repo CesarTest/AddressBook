@@ -11,8 +11,9 @@ class DataBase extends ObjetoWeb
  
     /*----------------------------------
      *        PRIVATE PROPERTIES
-     *------------;----------------------*/
-    // 1.- Reference to Pool of Connection
+     *----------------------------------*/
+    // 1.- References
+    protected $model;
     protected $pool;
     
     // 2.- Properties
@@ -21,18 +22,62 @@ class DataBase extends ObjetoWeb
     protected $user;
     protected $password;    
     protected $charset;
+
     
+    //----------------------------------------------
+    // PRIVATE METHOD
+    //----------------------------------------------
+    private function startConnection() {
+
+        $log_header=$this->line_header . __METHOD__ ."()] - ";
+        $success=false;
+        try {
+            
+            // 1.- Connection String
+            $connection = "mysql:host=" . $this->host . ";dbname=" . $this->db . ";charset=" . $this->charset;
+            $options = [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+            ];
+            
+            // 2.- Start Connection
+            $this->log->addDebug($log_header . "CONNECTING TO DATABASE [$connection]");
+            $pdo = new PDO($connection, $this->user, $this->password, $options);
+            $this->setPool($pdo);
+            $success=true;
+            
+        } catch (PDOException $e) {
+            $this->treatException($e
+                , $log_header . "EXCEPTION STARTING CONNECTION"
+                );
+            if(!empty($this->model)) {$controller=$this->model->getController();}
+            if(!empty($controller)) {
+                $controller->phpErrors('database',$e->getMessage());
+            }
+            
+        } catch (Error $e) {
+            $this->treatError($e
+                , $log_header . "ERROR STARTING CONNECTION"
+                );
+            if(!empty($this->model)) {$controller=$this->model->getController();}
+            if(!empty($controller))  {
+                $controller->phpErrors('database',$e->getMessage());
+            }
+        }
+ 
+        return $success;
+    }
+    
+    
+    //----------------------------------------------
+    // PUBLIC METHOD
+    //----------------------------------------------
     
     /**
      */
     public function __construct(Logger $log = null)
     {
-        parent::__construct($log = null);
-        $this->host=constant('HOST');
-        $this->db=constant('DB');
-        $this->user=constant('USER');
-        $this->password=constant('PASSWORD');
-        $this->charset=constant('CHARSET');
+        parent::__construct($log);
     }
     
     /**
@@ -41,33 +86,126 @@ class DataBase extends ObjetoWeb
      * @see Controller::start()
      */
     public function start(){
+        
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {
             
             // 0.- Trace Entry
-            $this->log->addDebug($log_header . "CONNECTING TO DATABASE");
+            $this->log->addDebug($log_header . "STARTING CONNECTION TO DATABASE : [" . $this->clase . "]");
+            $this->startConnection();
             
-            // 1.- Create pool of Connections
-            $connection = "mysql:host=" . $this->host . ";dbname=" . $this->db . ";charset=" . $this->charset;
-            $options = [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-            ];
-            $pdo = new PDO($connection, $this->user, $this->password, $options);
-            
-            // 2.- Assign Pool
-            $this->setPool($pdo);
-            
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $this->treatException($e
                 , $log_header . "EXCEPTION INITIATING DATABASE"
                 );
+            
         } catch (Error $e) {
             $this->treatError($e
                 , $log_header . "ERROR INITIATING DATABASE"
                 );
         }
     }
+    
+    //----------------------------------------------
+    // GETTER / SETTER
+    //----------------------------------------------
+    
+    /**
+     * @return mixed
+     */
+    public function getModel()
+    {
+        return $this->model;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDb()
+    {
+        return $this->db;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPassword()
+    {
+        return $this->password;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCharset()
+    {
+        return $this->charset;
+    }
+
+    /**
+     * @param mixed $model
+     */
+    public function setModel($model)
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * @param mixed $host
+     */
+    public function setHost($host)
+    {
+        $this->host = $host;
+    }
+
+    /**
+     * @param mixed $db
+     */
+    public function setDb($db)
+    {
+        $this->db = $db;
+    }
+
+    /**
+     * @param mixed $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @param mixed $password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * @param mixed $charset
+     */
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+    }
+
     
     /**
      * 

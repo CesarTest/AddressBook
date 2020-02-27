@@ -3,43 +3,61 @@ use Monolog\Logger;
 
 /**
  *
- * @author cesar
+ * @author Cesar Delgado
  *        
  */
-class Contact extends \Controller
+class Contact extends Controller
 {
-
     
     //--------------------------------
-    //       PRIVATE METHODS 
+    //       PRIVATE PROPERTIES
     //--------------------------------
-    private function validateNewAddressForm() {
-        $log_header=$this->line_header . __METHOD__ ."()] - ";
-        $this->log->addDebug( $log_header . "NEW ADDRESS FORM");
-        try {
-            
-            $fields=[  'name'    => [ 'value' => '' , 'type' => 'varchar(20)' ] 
-                     , 'surname' => [ 'value' => '' , 'type' => 'varchar(40)' ]
-                     , 'address' => [ 'value' => '' , 'type' => 'varchar(60)' ]
-                     , 'email'   => [ 'value' => '' , 'type' => 'varchar(40)' ]
-                     , 'phone'   => [ 'value' => '' , 'type' => 'varchar(10)' ]
-                     ];
+    protected $xml;
+    
+    /**
+     * @return string
+     */
+    public function getXml()
+    {
+        return $this->xml;
+    }
 
-            $this->validationTier2($fields);
-            
+    /**
+     * @param string $xml
+     */
+    public function setXml($xml)
+    {
+        $this->xml = $xml;
+    }
+
+    //--------------------------------
+    //       PUBLIC METHOD
+    //--------------------------------
+    public function start()
+    {
+        $log_header=$this->line_header . __METHOD__ ."()] - ";
+        try {
+            if(!empty($this->model)) {
+                $model=$this->model;
+                if (method_exists($model, 'start')) {$model->start();}
+            }
+            if(!empty($this->xml))   {$this->command="newAddress";}
+            parent::start();
             
         } catch (Exception $e) {
             $this->treatException($e
-                , $log_header . "NEW ADDRESS FORM"
+                , $log_header . "START [$this->clase]"
                 );
         } catch (Error $e) {
             $this->treatError($e
-                , $log_header . "NEW ADDRESS FORM"
+                , $log_header . "START [$this->clase]"
                 );
-        }    
+        }
     }
     
     /**
+     * 
+     * @param Logger $log
      */
     public function __construct(Logger $log = null)
     {
@@ -56,17 +74,20 @@ class Contact extends \Controller
     public function newAddress()
     {
         $log_header=$this->line_header . __METHOD__ ."()] - ";
-        $this->log->addDebug( $log_header . "LAUNCH [$this->clase] COMMAND");
+        $success=false;
+        $xml="";
         try {
-            
-            // 1.- Data Validations
-            $this->validateNewAddressForm();
-            
-            // 1.- Data Manipulation
-            $this->model->addContact();
-            
-            // 2.- Set View
-            $this->view->setName("success");
+            if(!empty($this->xml)) { $xml=__DIR__."/../config/".$this->xml; }
+            if(method_exists($this->view,"setFields")) {
+                $this->log->addDebug( $log_header . "LAUNCH [$this->clase] COMMAND" );
+                $this->view->setFields($this->captureForm());
+                $this->view->setFields($this->captureXMLfile($xml));
+                $this->view->setFields($this->validateFields());
+                $success=(empty($this->view->getErrorMessage()));
+            }
+            $this->view->setName("index");
+            if($success)   {$success=$this->model->addContact();}
+            if($success)   {$this->view->setName("Success");}
             
         } catch (Exception $e) {
             $this->treatException($e
@@ -78,6 +99,4 @@ class Contact extends \Controller
                 );
         }
     }
-    
 }
-

@@ -1,22 +1,27 @@
 <?php
 
-    $access = date("Y/m/d H:i:s");
-    error_log("[cesar.addressbook.index]: STARTING APPLICATION... [$access]");
-    
-   /*----------------------------------
-    *         LIBRARIES
-    *----------------------------------*/
+    /*----------------------------------
+     *      GLOBAL STATIC PROPERTIES
+     *----------------------------------*/
     $libs=__DIR__ . "/interfaces";
-    
-    // 1.- Load Libraries
-    try {
-         // Composer Libraries (dependencies)
-         $libs=__DIR__ . "/../vendor";
-         require_once $libs . "/autoload.php";
+    $line_header="[cesar.addressbook.index.php->";
+    $log_header=$line_header . "main]";
 
+    /*----------------------------------
+     *         LIBRARIES
+     *----------------------------------*/
+    // 1.- Load Libraries
+    $access = date("Y/m/d H:i:s");
+    error_log($log_header . "STARTING APPLICATION... [$access]");
+    try {
+        
          // Configuration File
          $libs=__DIR__ . "/config";
          require $libs . "/config.php";
+        
+         // Composer Libraries (dependencies)
+         $libs=__DIR__ . "/../vendor";
+         require_once $libs . "/autoload.php";
          
          // Parent Classes
          $libs=__DIR__ . "/interfaces";
@@ -27,19 +32,14 @@
          require $libs . "/Model.php";
          require $libs . "/DataBase.php";
 
-         
-         
     } catch (Exception $e) {
-        error_log("[cesar.addressbook.index] - ERROR LOADING MODULES  $e->getMessage()");
-        echo("[cesar.addressbook.index] - ERROR LOADING MODULES:  $e->getMessage()" );
+        error_log($log_header . "ERROR LOADING MODULES  $e->getMessage()");
+        echo($log_header . "ERROR LOADING MODULES:  $e->getMessage()" );
     }
 
     // Use Libraries
     use Monolog\Logger;
     
-    /*----------------------------------
-     *      GLOBAL STATIC PROPERTIES
-     *----------------------------------*/
      
     /*----------------------------------
      *      STATIC FUNCTIONS
@@ -50,6 +50,7 @@
       */
      function printPermission(int $permisos) {
          
+         $log_header=$line_header . __METHOD__ ."()] - ";
          $info="";
          try {
              
@@ -102,9 +103,9 @@
                  (($permisos & 0x0200) ? 'T' : '-'));
              
          } catch (Exception $e) {
-             error_log("[cesar.addressbook.index.printPermissions] - ERROR TRANSFORMING PERMISSIONS: $e->getMessage()" );
+             error_log($log_header . "ERROR TRANSFORMING PERMISSIONS: $e->getMessage()" );
          }          
-         error_log("[cesar.addressbook.index.printPermissions] - RESULT: [$info]" );
+         error_log($log_header . "RESULT: [$info]" );
          return $info;
      }
          
@@ -113,7 +114,8 @@
      */
     function initLoggingSystem() {
 
-        error_log("[cesar.addressbook.index] - INITIATING LOGGING SYSTEM:");
+        $log_header=$line_header . __METHOD__ ."()] - ";
+        error_log($log_header . "INITIATING LOGGING SYSTEM:");
         
         try {
 
@@ -127,9 +129,9 @@
             $permission_str=printPermission($permission);
             
             // 2.- Trace Parameters
-            error_log("[cesar.addressbook.index] - .................Log File: [$logfile]");
-            error_log("[cesar.addressbook.index] - ...............Log Folder: [$logs]");
-            error_log("[cesar.addressbook.index] - ........Folder pemissions: [$permission_str]");
+            error_log($log_header . ".................Log File: [$logfile]");
+            error_log($log_header . "...............Log Folder: [$logs]");
+            error_log($log_header . "........Folder pemissions: [$permission_str]");
             
             /*
              *            ACTIONS
@@ -137,13 +139,13 @@
             $log = new Logger("[cesar.addressbook]");
             if ( ($permission & 0x0080) | ($permission & 0x0002)) {
                 $log->pushHandler(new Monolog\Handler\StreamHandler($logfile, Monolog\Logger::DEBUG));
-                $log->addDebug("LOGGING SYSTEM CORRECTLY INITIATED");                
+                $log->addDebug($log_header . "LOGGING SYSTEM CORRECTLY INITIATED");                
             } else {
-                error_log("[cesar.addressbook.index] - NO WRITE PERMISSIONES TO FOLDER - logs=[$logs]" );
+                error_log($log_header . "NO WRITE PERMISSIONES TO FOLDER - logs=[$logs]" );
             }
             
         } catch (Error $e) {
-            error_log("[cesar.adressbook.index] - LOGGING SYSTEM INITIATION FAILED:" . $e->getMessage());
+            error_log($log_header . "LOGGING SYSTEM INITIATION FAILED:" . $e->getMessage());
             error_log($e->getTraceAsString());
         }
         return $log;
@@ -156,7 +158,7 @@
     // 1.- Start Logging System
     $log=initLoggingSystem();
     $out = print_r($log, true);
-    $log->addDebug("....... log=[$out]");
+    $log->addDebug($log_header . "....... log=[$out]");
     
     // 2.- Launch Application
     try {
@@ -166,9 +168,9 @@
         $app->start();
         
     } catch (Error $e) {
-        error_log("[cesar.addressbook.index.php] - APPLICATION FAIL TO START");
+        error_log($log_header . "APPLICATION FAIL TO START");
         error_log($e->getMessage());
-        $log->addError("[cesar.addressbook.index.php] - APPLICATION FAIL TO START");
+        $log->addError($log_header . "APPLICATION FAIL TO START");
         $log->addError($e->getMessage());
         $log->addError($e->getTraceAsString());
     }

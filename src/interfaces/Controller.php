@@ -2,7 +2,7 @@
 
 /**
  *
- * @author cesar
+ * @author Cesar Delgado
  *        
  */
 use Monolog\Logger;
@@ -16,6 +16,8 @@ class Controller extends ObjetoWeb
         // 1.- MVC References
         protected $view;    
         protected $model;
+        protected $book;
+        
         
         // 2.- Controller operties
         protected $command; 
@@ -24,15 +26,39 @@ class Controller extends ObjetoWeb
         /*----------------------------------
          * PRIVATE METHODS
          *----------------------------------*/
-        
-        private function test_type($type, $value) {
+        /**
+         * 
+         * @param string $type
+         * @param string $value
+         * @param int $min
+         * @param int $max
+         * @return string
+         */
+        private function test_type(string $type='varchar', string $value='', int $min=0, int $max=0, string $field) {
 
             // 1.- Validate Type
             //-----------------
             $log_header=$this->line_header . __METHOD__ ."()] - ";
-            $output=$formFields;
+            $output;
             try {
-                $this->log->addDebug( $log_header . "OK");
+
+                // 1.1.- Log entry
+                $this->log->addDebug( $log_header . "Validate Type type=[$type],value=[$value],min=[$min], max=[$max]]");
+                
+                // 1.2.- Size Validation
+                if(empty($value) and ($min>0)) {
+                    $output="<p>[$field] - Empty not allowed, expected=[$type], minimum size=[$min] </p>";
+                    
+                } elseif (sizeof($value) < $min) {
+                    $output="<p>[$field] - Too short, expected=[$type], minimum size=[$min] </p>";
+                    
+                } elseif ($max>0) {
+                    if (sizeof($value) > $max) {
+                        $output="<p>[$field] - Too long, expected=[$type], maximum size=[$max] <p>";
+                    }
+                }
+                
+                // 1.3.- Validate format
                 
             } catch (Exception $e) {
                 $this->treatException($e
@@ -48,39 +74,77 @@ class Controller extends ObjetoWeb
             //-----------------
             return $output;
         }
+
+        /**
+         *
+         * @param array $formFields
+         * @return array
+         */
+        protected function captureXMLfile(string $xmlFile="") {
             
-        
-        
-        protected function validationTier2(array $formFields) {
-            
-            
-            // 1.- Capture Form
-            //-----------------
             $log_header=$this->line_header . __METHOD__ ."()] - ";
-            $output=$formFields; 
+            $out=[];
             try {
- 
-                $this->log->addDebug( $log_header . "VALIDATE FORM FIELDS");                
-                if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                    foreach($formFields as $key=>$value){
-                        $valor  = $this->test_input($_POST[$key]);
-                        $tipo   = $formFields[$key][$type];
-                        if ($this->test_type($tipo, $valor)) {
-                            $output[$key][$value]=$valor;
-                        } else {
-                            $output[$key][$value]="Invalid Entry, type=[$type]";
-                            $this->view->setName("error");
-                            $this->view->setMessage("[$key]=[$valor] - Type=[$tipo]");
+
+                // 1.- Init output
+                $output=$this->view->getFields();
+                
+                // 2.- Capture from XML file
+                if(!empty($xmlFile)) {
+                    if(file_exists($xmlFile)) {
+                        $this->log->addDebug( $log_header . "READING XML=[$xmlFile]");
+                        $data=simplexml_load_file($xmlFile);
+                        foreach ($data as $key => $value) {
+                            $output[$key]['value']=$value;                                                        
                         }
                     }
                 }
+                
             } catch (Exception $e) {
                 $this->treatException($e
-                    , $log_header . "TIER 2 DATA VALIDATIONS"
+                    , $log_header . "CAPTURE XML FILE"
                     );
             } catch (Error $e) {
                 $this->treatError($e
-                    , $log_header . "TIER 2 DATA VALIDATIONS"
+                    , $log_header . "CAPTURE XML FILE"
+                    );
+            }
+            
+            return $output;
+        }
+        
+        
+        /**
+         * 
+         * @param array $formFields
+         * @return array
+         */
+        protected function captureForm(array $formFields=[]) {
+                        
+            // 1.- Capture Form
+            //-----------------
+            $log_header=$this->line_header . __METHOD__ ."()] - ";
+            try {
+
+                // 1.1.- Detect Form Fields
+                if(empty($formFields)){$formFields=$this->view->getFields();}
+                $output=$formFields;
+                
+                // 1.2.- Capture Form                    
+                if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                    $this->log->addDebug( $log_header . "CAPTURE FORM [". serialize($output) ."]");
+                    foreach($formFields as $key=>$value){
+                        $valor  = $this->test_input($_POST[$key]);
+                        $output[$key]['value']=$valor;
+                    }
+                } 
+            } catch (Exception $e) {
+                $this->treatException($e
+                    , $log_header . "CAPTURE FORM"
+                    );
+            } catch (Error $e) {
+                $this->treatError($e
+                    , $log_header . "CAPTURE FORM"
                     );
             }
 
@@ -88,7 +152,52 @@ class Controller extends ObjetoWeb
             //-----------------
             return $output;
         }
-        
+ 
+        /**
+         *
+         * @param array $formFields
+         * @return array
+         */
+        protected function validateFields(array $fields=[]) {
+            
+            // 1.- Capture Form
+            //-----------------
+            $log_header=$this->line_header . __METHOD__ ."()] - ";
+            try {
+                
+                // 1.1.- Detect Fields
+                if(empty($fields)){$fields=$this->view->getFields();}
+                $output=$fields;
+                $this->log->addDebug( $log_header . "VALIDATE FIELDS ");
+                
+                // 1.2.- Validate fields
+                foreach($fields as $key=>$value){
+                    $error  = $this->test_type($fields[$key]['type']
+                        ,$fields[$key]['value']
+                        ,$fields[$key]['min']
+                        ,$fields[$key]['max']
+                        ,$fields[$key]['label']);
+                    
+                    if (!empty($error)) {
+                        $this->log->addDebug( $log_header . "Input Error error=[". $error . "]");
+                        $this->phpErrors("Validation", $error);
+                        $formFields[$key]['value']=''; // Remove invalid field
+                    }
+                }
+            } catch (Exception $e) {
+                $this->treatException($e
+                    , $log_header . "VALIDATE FIELDS"
+                    );
+            } catch (Error $e) {
+                $this->treatError($e
+                    , $log_header . "VALIDATE FIELDS"
+                    );
+            }
+            
+            // 2.- Return
+            //-----------------
+            return $output;
+        }
         
         /*----------------------------------
          * PUBLIC METHODS
@@ -96,13 +205,61 @@ class Controller extends ObjetoWeb
         
         /**
          *
+         * @param string $errorType
+         * @param string $errorMsg
+         * @return string
+         */
+        public function phpErrors(string $errorType, string $errorMsg) {
+            
+            $log_header=$this->line_header . __METHOD__ ."()] - ";
+            $vista=false;
+            $view;
+            try {
+                
+                if (property_exists($this, view)) {$view=$this->view;}
+                if(!empty($view)) {
+
+                    $this->log->addDebug( $log_header . "  PHP ERRORS [$errorType] / [$errorMsg]");
+                    
+                    // 1.- Set message
+                    //-----------------
+                    $msg=$view->getErrorMessage();
+                    $msg=$msg.$errorMsg;
+                    $view->setErrorMessage($msg);
+                    $view->setMessage($errorType);
+                    
+                    // 2.- Set View
+                    //--------------
+                    $vista="/../errors/" . strtolower( $this->clase );
+                    if(method_exists($this->view, 'setName')) {$this->view->setName($vista);}
+                }
+                
+            } catch (Exception $e) {
+                $this->treatException($e
+                    , $log_header . "LOADING PHP ERROR VIEW"
+                    );
+            } catch (Error $e) {
+                $this->treatError($e
+                    , $log_header . "LOADING PHP ERROR VIEW"
+                    );
+            }
+        
+            // 3.- Return View
+            //---------------
+            return $vista;
+        }
+        
+        /**
+         *
          */
         public function render(){
             $log_header=$this->line_header . __METHOD__ ."()] - ";
             try { 
-                $name=$this->view->getName();
-                $this->log->addDebug($log_header . "LAUNCHING VIEW [$name]");
-                if(!empty($this->view)) {$this->view->start();}
+                if(!empty($this->view)) {
+                    $name=$this->view->getName();
+                    $this->log->addDebug($log_header . "LAUNCHING VIEW [$name]");
+                    $this->view->start();
+                }
             } catch (Exception $e) {
                 $this->treatException($e
                     , $log_header . "ERROR STARTING CONTROLLER"
@@ -131,23 +288,19 @@ class Controller extends ObjetoWeb
                 // 1.- Set Properties
                 if (!empty($properties)) {$this->setProperties($properties);}
                 
-                // 1.- Create View
-                $vista=$this->spawnObject();
-                $this->view=$vista;
-                     
-                // 2.- Load Model
-                $nombre=$this->clase ."Model";
-                $class=$this->loadModule($nombre,"/../models");
+                // 2.- Create View
+                $object=$this->createClass($this->clase."View","/../views");
+                if($object===false) { $object=$this->spawnObject("View"); }
+                $this->view=$object;
                 
-                if (!empty($class)) {
-                    $modelo=$this->spawnObject($class);
-                    $this->model=$modelo;
-                } 
+                // 3.- Create Model
+                $object=$this->createClass($this->clase."Model","/../models");
+                if(!($object===false)) { $this->model=$object; }
                
-                // 3.- Dump Controller Properties
+                // 4.- Dump Controller Properties
                 $this->printProperties();
                 
-                // 4.- Init View
+                // 5.- Init View
                 $properties=[
                       'controller'=>$this 
                     , 'vista'=>$this->command
@@ -156,17 +309,17 @@ class Controller extends ObjetoWeb
                     if (method_exists($this->view, "init")) { 
                         $this->view->init($properties);
                     } else {
-                        $this->log->addError($log_header . "INIT METHOD NOT FOUND IN [get_class($this->view)]");
+                        $tmp=get_class($this->view);
+                        $this->log->addError($log_header . "INIT METHOD NOT FOUND IN VIEW [$tmp]");
                     }
                 }
                 
-                // 5.- Init Model
-                $properties=[];
+                // 6.- Init Model
                 if (method_exists($this->model, "init")) {
-                    $this->model->init();
+                    $this->model->init($properties);
                 } else {
-                    $tmp=get_class($this->view);
-                    $this->log->addError($log_header . "INIT METHOD NOT FOUND IN [$tmp]");
+                    $tmp=get_class($this->model);
+                    $this->log->addError($log_header . "INIT METHOD NOT FOUND IN MODEL [$tmp]");
                 }
                 
             } catch (Exception $e) {

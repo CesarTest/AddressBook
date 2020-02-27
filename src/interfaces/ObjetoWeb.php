@@ -30,23 +30,19 @@ class ObjetoWeb
      * @param array $properties
      * @return object
      */
-    protected function spawnObject(string  $class="View"
-                                  , array  $properties=[]) 
+    protected function spawnObject(string  $class="View") 
     {
         // 0.- Trace Entry
         //-----------------
         $log_header=$this->line_header . __METHOD__ ."()] - ";
-        $this->log->addDebug($log_header . "SPAWN OBJECT class=[" . $class . "]");
-        $this->log->addDebug($log_header . "........ properties=[" . serialize($properties) . "]");
         
         // 1.- Creating Object
         //-----------------
-        $object;
+        $object=false;
         try {
-            $this->log->addDebug($log_header . "NEW OBJECT : [$class]");
+            $this->log->addDebug($log_header . "SPAWN OBJECT class=[" . $class . "]");
             $object = new $class;
             if(!empty($this->log))  {$object->setLog($this->log);}
-            if(!empty($properties)) {$object->setProperties($properties);}
         } catch (Exception $e) {
             $this->treatException($e
                 , $log_header . "FAIL SPAWING OBJECT"
@@ -78,12 +74,14 @@ class ObjetoWeb
         // 0.- Trace Entry 
         //-----------------
         $log_header=$this->line_header . __METHOD__ ."()] - ";
-        $this->log->addDebug($log_header . "LOADING MODULE class=[" . $path . "/" . $class . "]");
         
         // 1.- Load Module
         //-----------------
-        $out="";
+        $out=false;
         try {
+
+            // 1.0.- Trace Entry
+            $this->log->addDebug($log_header . "LOADING MODULE class=[" . $path . "/" . $class . "]");
             
             // 1.1.- Module File Detection
             $modulePath=__DIR__ . $path;
@@ -98,7 +96,7 @@ class ObjetoWeb
             
             // 1.2.- Loading Class
             if(file_exists($moduleFile)) {
-                $this->log->addDebug($log_header . "LOADING CLASS : [$moduleFile]");
+                $this->log->addDebug($log_header . "LOADING CLASS MODULE: [$moduleFile]");
                 require $moduleFile;
                 $out=$class;
             } else {
@@ -120,7 +118,47 @@ class ObjetoWeb
         //-----------------
         return $out;
     }
-    
+
+    protected function createClass(string  $module="View"
+                                 , string  $path="" 
+                                 , string  $default="none"
+                                 , string  $error="none"
+                                )
+    {
+        $log_header=$this->line_header . __METHOD__ ."()] - ";
+        
+        // 1.- Creating Object
+        //-----------------
+        $object=false;
+        try {
+
+            // 1.0.- Trace Entry
+            $this->log->addDebug($log_header . "CREATE CLASS module=[" . $module . "]");
+            
+            // 1.1.- Spawn Object
+            $class=$this->loadModule($module,$path,$default,$error);
+            if(!($class===false)) {$object=$this->spawnObject($class);}
+            
+            // 1.2.- Set Property
+            if (!($object===false)) {
+                $property=strtolower($module);
+                if(property_exists($this, $property)){$this->{$property}=$object;}
+            }
+        } catch (Exception $e) {
+            $this->treatException($e
+                , $log_header . "FAIL CREATING CLASS [$type]"
+                );
+        } catch (Error $e) {
+            $this->treatError($e
+                , $log_header . "FAIL CREATING CLASS [$type]"
+                );
+        }
+        
+        // 2.- Return the object
+        //-------------------
+        return $object;
+    }
+      
     /**
      *
      * @param string $json
@@ -133,7 +171,7 @@ class ObjetoWeb
                 $this->log->addDebug($log_header . "SETTING OBJECT PROPERTIES - [" . serialize($input) . "]");
                 if (!empty($input)) {
                     foreach($input as $key=>$value){
-                        $this->$key = $value;
+                        if (property_exists($this, $key)) {$this->$key = $value;}
                     }
                 }
             }
@@ -207,7 +245,6 @@ class ObjetoWeb
         return $data;
     }
     
-    
     /**
      * 
      * @param \Error $error
@@ -261,7 +298,7 @@ class ObjetoWeb
               
           }
       }
-      
+
       
     /*----------------------------------
      *           SETTER / GETTER
@@ -324,9 +361,13 @@ class ObjetoWeb
     }
     
     
-    /*----------------------------------R
+    /*----------------------------------
      *           CONSTRUCTOR
      *----------------------------------*/
+    /**
+     * 
+     * @param Logger $log
+     */
     public function __construct(Logger $log=null){
         try {
             // 1.- Module Properties as Log Header

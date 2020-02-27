@@ -22,9 +22,8 @@ class AddressBook extends ObjetoWeb
     
      // 2.- Parameters Capture
      protected $url;
-     protected $controllerModule='Index';
-     protected $controllerCommand;
-     protected $controllerParameters;
+     protected $controllerName='Index';
+     protected $controllerProperties=[];
      
      // 3.- Model-Viewer-Controller Object Referente
      protected $controller;
@@ -32,49 +31,137 @@ class AddressBook extends ObjetoWeb
      /*----------------------------------
       *      PRIVATE METHODS
       *----------------------------------*/
-     
-     /*
-      *
-      */
-     private function treatURL() {
+
+     private function captureURL(){
          $log_header=$this->line_header . __METHOD__ ."()] - ";
          try {
-
-             // 1.- Prepare URL
-             $this->url=rtrim($this->url, '/');
-             $this->url=explode('/', $this->url);
-             
-             // 2.- Decompose URL
-             $properties=array("controllerModule", "controllerCommand", "controllerParameters" );
-             $nparam = sizeof($this->url);
-             for ($i=0; $i<3; $i++) {
-                 $name=$properties[$i];
-                 if (!empty($this->url[$i])) {
-                     
-                     if ($i<2) { $value=$this->url[$i];}
-                     else      {
-                         $value = [];
-                         for($p = $i; $p < $nparam; $p++){
-                             array_push($value, $this->url[$p]);
-                         }
-                         //$value=$this->url.array_slice($i+1, $nparam); 
-                     }
-                     $this->log->addDebug($log_header . ".....". $name . "= [" . serialize($value) . "]"); 
-                     $this->{$name}=$value;
-                 }
-             }
-             
-             // 3.- Normalize naming
-             $this->controllerModule=ucfirst($this->controllerModule);
-             
+             $this->log->addDebug($log_header . "CAPTURE URL");
+             $this->url=null;
+             if (isset($_GET['url'])) {$this->url=$_GET['url'];}
              
          } catch (Exception $e) {
              $this->treatException($e
-                 , $log_header . "URL DECOMPOSITION FAIL : [" . serialize($this->url) . "]"
+                 , $log_header . "CAPTURE URL"
                  );
          } catch (Error $e) {
              $this->treatError($e
-                 , $log_header . "URL DECOMPOSITION FAIL : [" . serialize($this->url) . "]"
+                 , $log_header . "CAPTURE URL"
+                 );
+         }
+     }
+
+     private function captureParametersURL(){
+         $log_header=$this->line_header . __METHOD__ ."()] - ";
+         $output=[];
+         try {
+             if (isset($_GET)) {
+                 $this->log->addDebug($log_header . "CAPTURE PARAMETERS URL [".serialize($_GET)."]");
+                 foreach ($_GET as $key => $value) {
+                     if(strpos($key, 'url')===false) {
+                        $output[$key] = $value;
+                     }
+                 }
+             } 
+             
+         } catch (Exception $e) {
+             $this->treatException($e
+                 , $log_header . "CAPTURE PARAMETERS URL"
+                 );
+         } catch (Error $e) {
+             $this->treatError($e
+                 , $log_header . "CAPTURE PARAMETERS URL"
+                 );
+         }
+         return $output;
+     }
+     
+     /*
+      *  Input Format: / field[ key=value ] / field[ key=value ] / ...
+      *  If key provided in $keys, then value=field 
+      *   
+      */
+     private function decomposeURL(string $field, array $keys=[]) {
+         
+         $log_header=$this->line_header . __METHOD__ ."()] - ";
+         $output=[];
+         try {
+             
+             $this->log->addDebug($log_header . "DECOMPOSE URL [" . serialize($field) . "]");
+
+             // 1.- Prepare Field
+             $field=rtrim($field, '/');
+             $properties=explode('/', $field);
+             if(empty($properties)) {$properties[0]=$field;}
+             
+             // 2.- Capture fields
+             $nprop = sizeof($properties);
+             $nkeys = sizeof($keys);
+             $output= [];
+             for($i = 0; $i < $nprop; $i++){
+                 $key=''; $value='';
+                 if($i < $nkeys) {
+                     $key=$keys[$i];
+                     $value=$properties[$i];
+                     $output[$key]=$value;
+                 } else {
+                     $campo=explode('=', $properties[$i]);
+                     if(empty($campo)) {$key=$campo;
+                     } else {
+                        $key=$campo[0];
+                        if(sizeof($campo)>1) {$value=$campo[1];}
+                        $output[$key]=$value;
+                     }
+                 }
+             }
+             
+         } catch (Exception $e) {
+             $this->treatException($e
+                 , $log_header . "DECOMPOSE URL"
+                 );
+         } catch (Error $e) {
+             $this->treatError($e
+                 , $log_header . "DECOMPOSE URL"
+                 );
+         }
+       
+         // 2.- Return Properties
+         //---------------------
+         return $output;
+     }
+     
+     /*
+      *
+      */ 
+     private function treatURL() {
+         $log_header=$this->line_header . __METHOD__ ."()] - ";
+         try {
+             $this->log->addDebug($log_header . "TREAT URL");
+             
+             // 1.- Treat URL
+             $this->captureURL();
+             $properties=$this->decomposeURL($this->url,['controller','command']);
+             
+             // 2.- Treat Parameters
+             $parameters=$this->captureParametersURL();
+             $properties=array_merge($properties, $parameters);
+             
+             // 3.- Set object properties
+             if (!empty($properties)) {
+                 if (!empty($properties['controller'])) {
+                    $this->controllerName=ucwords($properties['controller']);
+                 }
+                 unset($properties['controller']);
+             }
+             $properties['book']=this;
+             $this->controllerProperties=$properties;
+             
+         } catch (Exception $e) {
+             $this->treatException($e
+                 , $log_header . "TREAT URL : [" . serialize($this->url) . "]"
+                 );
+         } catch (Error $e) {
+             $this->treatError($e
+                 , $log_header . "TREAT URL : [" . serialize($this->url) . "]"
                  );
          }
      }
@@ -89,34 +176,28 @@ class AddressBook extends ObjetoWeb
      public function __construct(Logger $log=null){parent::__construct($log);}
      
      /**
-      *  Decompose URL, create controller and trace object properties
+      * Decompose URL, create controller and trace object properties
+      * {@inheritDoc}
+      * @see ObjetoWeb::init()
       */
-     public function init() {
+     public function init(array $properties=[]) {
          $log_header=$this->line_header . __METHOD__ ."()] - ";
          try {
 
              // 0.- Log Entry
-             $this->log->addDebug($log_header . "CAPTURING PARAMETERS");
+             $this->log->addDebug($log_header . "INITIATING ADDRESS BOOK url=[" . serialize($_GET) ."]");
              
              // 1.- Capture URL
-             $this->url=isset($_GET['url'])? $_GET['url']: null;
              $this->treatURL();
              
              // 2.- Load Controller
-             $class=$this->loadModule($this->controllerModule,"/../controllers", "none");
-             
-             // 3.- Spawn Controller
-             if (!empty($class)) {
-                 $controller=$this->spawnObject($class);
-                 $this->controllerModule=$class;
-                 $this->controller=$controller;
-             }
+             $this->log->addDebug($log_header . "......CONTROLLER NAME [" . $this->controllerName . "]");
+             $this->controller=$this->createClass($this->controllerName,"/../controllers","Index");
              
              // 4.- Initiate Controller
-             if (!empty($this->controller)) {
-                 $properties = ['command'   =>$this->controllerCommand
-                              , 'parameters'=>$this->controllerParameters];
-                 $this->controller->init($properties);
+             if (!($this->controller===false)) {
+                 $this->log->addDebug($log_header . "CONTROLLER PROPERTIES [" . serialize($this->controllerProperties) . "]");
+                 $this->controller->init($this->controllerProperties);
              }
              
              // 4.- Dump Object Propeties

@@ -13,26 +13,12 @@ class Model extends ObjetoWeb
     //----------------------------
     //   PRIVATE PROPERTIES
     //----------------------------
-    private $connection;
+    protected $connection;
+    protected $controller;
 
-    /**
-     * @return DataBase
-     */
-    public function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
-     * @param DataBase $connection
-     */
-    public function setConnection($connection)
-    {
-        $this->connection = $connection;
-    }
 
     //----------------------------
-    //   PUBLIC CONTACT
+    //      PUBLIC METHODS
     //----------------------------
     /**
      * 
@@ -52,16 +38,24 @@ class Model extends ObjetoWeb
             // 0.- Trace Entry
             $this->log->addDebug($log_header . "INITIATING MODEL: [" . $this->clase . "]");
                         
-            // 1.- Set Object Properties
-            //parent::init($properties);
-            
-            // 2.- Start Connection
-            $this->connection=new DataBase();
-            $this->connection->setLog($this->log);
+            // 1.- Init Connection
+            $object=$this->spawnObject('DataBase');
+            $properties['connection']=$object;
 
+      
+            // 2.- Set Object Properties
+            parent::init($properties);
+            
             // 3.- Init Connection
-            $this->connection->init($properties);                            
-            //$this->connection->start();
+            $this->loadModule('config','/../config','config','config');
+            $db_connection=[ 'model'   => $this
+                        ,'host'     => constant('DB_HOST')
+                        ,'db'       => constant('DB_NAME')
+                        ,'user'     => constant('DB_USER')
+                        ,'password' => constant('DB_PASSWORD')
+                        ,'charset'  => constant('DB_CHARSET')
+                        ];
+            $this->connection->init($db_connection);                            
             
         } catch (Exception $e) {
             $this->treatException($e
@@ -86,11 +80,11 @@ class Model extends ObjetoWeb
             // 0.- Trace Entry
             $this->log->addDebug($log_header . "STARTING MODEL : [" . $this->clase . "]");
             
-            // 1.- Set Object Properties
-            $this->connection.start();
+            // 1.- Start Connection
+            $this->connection->start();
             
         } catch (Exception $e) {
-            $this->treatException($e
+            $this->eatException($e
                 , $log_header . "EXCEPTION STARTING MODEL"
                 );
         } catch (Error $e) {
@@ -99,4 +93,42 @@ class Model extends ObjetoWeb
                 );
         }
     }
+
+    //----------------------------
+    //      GETTER / SETTER
+    //----------------------------
+    
+    
+    /**
+     * @return mixed
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+    
+    /**
+     * @param mixed $controller
+     */
+    public function setController($controller)
+    {
+        $this->controller = $controller;
+    }
+    
+    /**
+     * @return DataBase
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+    
+    /**
+     * @param DataBase $connection
+     */
+    public function setConnection($connection)
+    {
+        $this->connection = $connection;
+    }
+    
 }

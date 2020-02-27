@@ -5,30 +5,33 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<title>Address Book</title>
-</head>
-<body>
+    </head>
+    <body>
 
-    <?php require 'views/header.php'; ?>
-
-    <div id="main">
-        <h1 class="center">Add Contact!</h1>
-        <div><?php echo $this->mensaje; ?></div>
-        <form action="<?php echo constant('URL'); ?>contact/newAddress" method="POST">
-            <label for="">First Name</label><br>
-            <input type="text" name="name" id=""><br>
-            <label for="">Surname</label><br>
-            <input type="text" name="surname" id=""><br>
-            <label for="">Address</label><br>
-            <input type="text" name="address" id=""><br>
-            <label for="">eMail</label><br>
-            <input type="text" name="email" id=""><br>
-            <label for="">Phone</label><br>
-            <input type="text" name="phone" id=""><br>
-            <input type="submit" value="Add New Contact">
-        </form>
-    </div>
+    	<?php require 'views/header.php'; ?>
+    
+        <div id="main">
+            <h1 class="center">Add Contact!</h1>
+            <div>
+                <?php 
+                      if (!empty($this->message))      { echo("<h2>"        . $this->message      . "</h2>");}
+        		      if (!empty($this->errorMessage)) { echo('<h3>ERROR: ' . $this->errorMessage . '</H3>'); }
+        		?>
+    		</div>
+    		
+            <form action="<?php echo constant('URL'); ?>contact/newAddress" method="POST">
+            	<?php 
+            	$fields=$this->fields;
+            	foreach($fields as $key=>$value){ 
+            	    echo ('<label for="">'.$fields[$key]['label'].'</label><br>');
+            	    echo ('<input type="text" name="'.$key.'" id="" value="'.$fields[$key]['value'].'" ><br>');
+            	}
+            	?>
+                <input type="submit" value="Add New Contact">
+            </form>
+        </div>
 
     <?php require 'views/footer.php'; ?>
     
-</body>
-</html>
+   </body>
+</html> 

@@ -6,7 +6,7 @@ use Monolog\Logger;
  * @author cesar
  *        
  */
-class ContactModel extends \Model
+class ContactModel extends Model
 {
 
     /**
@@ -19,7 +19,9 @@ class ContactModel extends \Model
     }
 
     public function addContact() {
-        echo("AGREGANDO USUARIO");
+        echo("AGREGANDO USUARIO.........");
+        //echo serialize(get_class_methods($this));
+        return true;
     }
     
 }

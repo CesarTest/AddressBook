@@ -20,7 +20,24 @@ class View extends ObjetoWeb
      // 2.- View Properties
      protected $vista="index"; // Name of current view
      protected $message;
+     protected $errorMessage;
      
+    /**
+     * @return mixed
+     */
+    public function getErrorMessage()
+    {
+        return $this->errorMessage;
+    }
+
+    /**
+     * @param mixed $errorMessage
+     */
+    public function setErrorMessage($errorMessage)
+    {
+        $this->errorMessage = $errorMessage;
+    }
+
     /**
      * @return string
      */
@@ -46,7 +63,51 @@ class View extends ObjetoWeb
     /*----------------------------------
      * PUBLIC METHODS
      *----------------------------------*/
-    
+     /**
+      *
+      * {@inheritDoc}
+      * @see ObjetoWeb::start()
+      */
+     public function callController($method, $parameters) {
+         
+         $log_header=$this->line_header . __METHOD__ ."()] - ";
+         try {
+             $this->controller->{$method}($parameters);
+         } catch (Exception $e) {
+             $this->treatException($e
+                 , $log_header . "CALLING CONTROLLER "
+                 );
+             
+         } catch (Error $e) {
+             $this->treatError($e
+                 , $log_header . "ERROR STARTING VIEW ]"
+                 );
+         }
+     }
+     
+     
+     /**
+      * 
+      */
+     public function refresh(string $url="") {
+         
+         $log_header=$this->line_header . __METHOD__ ."()] - ";
+         try {
+             if(empty($url)) {$url = $_SERVER['PHP_SELF'];}
+             header($url);
+             
+         } catch (Exception $e) {
+             $this->treatException($e
+                 , $log_header . "ERROR REFRESHING VIEW ]"
+                 );
+             
+         } catch (Error $e) {
+             $this->treatError($e
+                 , $log_header . "ERROR REFRESING VIEW ]"
+                 );
+         }
+     }
+     
     /**
      * 
      * {@inheritDoc}
@@ -74,6 +135,8 @@ class View extends ObjetoWeb
             
             // 3.- Load View (DHTML)
             $this->log->addDebug($log_header . "LAUNCHING VIEW [$fileVista]");
+            $this->log->addDebug($log_header . ".... errorMessage [".$this->errorMessage."]");
+            
             if (file_exists($fileVista)) { 
                 require $fileVista; 
             } else {
