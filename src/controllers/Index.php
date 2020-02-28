@@ -18,7 +18,7 @@ class Index extends Controller {
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {
             $vista="welcome";
-            $this->log->addDebug($log_header . "SWITICHING VIEW [$vista]");
+            $this->debug($log_header . "SWITICHING VIEW [$vista]");
             $this->view->setName($vista);
         } catch (Exception $e) {
             $this->treatException($e

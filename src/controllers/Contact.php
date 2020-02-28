@@ -37,11 +37,17 @@ class Contact extends Controller
     {
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {
+  
+            $this->debug($log_header . "START class=[$this->clase]");
+            
+            // 1.- Start Database Connection
             if(!empty($this->model)) {
                 $model=$this->model;
                 if (method_exists($model, 'start')) {$model->start();}
             }
             if(!empty($this->xml))   {$this->command="newAddress";}
+            
+            // 2.- Start View
             parent::start();
             
         } catch (Exception $e) {
@@ -79,7 +85,7 @@ class Contact extends Controller
         try {
             if(!empty($this->xml)) { $xml=__DIR__."/../config/".$this->xml; }
             if(method_exists($this->view,"setFields")) {
-                $this->log->addDebug( $log_header . "LAUNCH [$this->clase] COMMAND" );
+                $this->debug( $log_header . "LAUNCH [$this->clase] COMMAND" );
                 $this->view->setFields($this->captureForm());
                 $this->view->setFields($this->captureXMLfile($xml));
                 $this->view->setFields($this->validateFields());

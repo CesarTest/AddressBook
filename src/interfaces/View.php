@@ -127,20 +127,20 @@ class View extends ObjetoWeb
             if (!empty($this->vista))       {$vista=strtolower($this->vista);}
             
             // 2.- Construct View URL
-            $this->log->addDebug($log_header . "STARTING VIEW [$controlador / $vista]");
+            $this->debug($log_header . "STARTING VIEW [$controlador / $vista]");
             $fileVista=$ruta . "/" . $controlador . "/" . $vista . "." . $ext;
             if (!file_exists($fileVista)) {$fileVista=$ruta . "/" . $controlador . "/index." . $ext;}
             if (!file_exists($fileVista)) {$fileVista=$ruta . "/index/" . $vista . "." . $ext;}
             if (!file_exists($fileVista)) {$fileVista=$ruta . "/index/index.php";}
             
             // 3.- Load View (DHTML)
-            $this->log->addDebug($log_header . "LAUNCHING VIEW [$fileVista]");
-            $this->log->addDebug($log_header . ".... errorMessage [".$this->errorMessage."]");
+            $this->debug($log_header . "LAUNCHING VIEW [$fileVista]");
+            $this->debug($log_header . ".... errorMessage [".$this->errorMessage."]");
             
             if (file_exists($fileVista)) { 
                 require $fileVista; 
             } else {
-                $this->log->addDebug($log_header . "VIEW NOT FOUND[$fileVista]");
+                $this->debug($log_header . "VIEW NOT FOUND[$fileVista]");
             }
         } catch (Exception $e) {
             $this->treatException($e

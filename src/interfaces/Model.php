@@ -36,7 +36,7 @@ class Model extends ObjetoWeb
         try {
             
             // 0.- Trace Entry
-            $this->log->addDebug($log_header . "INITIATING MODEL: [" . $this->clase . "]");
+            $this->debug($log_header . "INITIATING MODEL: [" . $this->clase . "]");
                         
             // 1.- Init Connection
             $object=$this->spawnObject('DataBase');
@@ -78,7 +78,8 @@ class Model extends ObjetoWeb
         try {
             
             // 0.- Trace Entry
-            $this->log->addDebug($log_header . "STARTING MODEL : [" . $this->clase . "]");
+            
+            $this->debug($log_header . "STARTING MODEL : [" . $this->clase . "]");
             
             // 1.- Start Connection
             $this->connection->start();

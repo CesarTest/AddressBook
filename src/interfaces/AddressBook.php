@@ -35,7 +35,7 @@ class AddressBook extends ObjetoWeb
      private function captureURL(){
          $log_header=$this->line_header . __METHOD__ ."()] - ";
          try {
-             $this->log->addDebug($log_header . "CAPTURE URL");
+             $this->debug($log_header . "CAPTURE URL");
              $this->url=null;
              if (isset($_GET['url'])) {$this->url=$_GET['url'];}
              
@@ -55,7 +55,7 @@ class AddressBook extends ObjetoWeb
          $output=[];
          try {
              if (isset($_GET)) {
-                 $this->log->addDebug($log_header . "CAPTURE PARAMETERS URL [".serialize($_GET)."]");
+                 $this->debug($log_header . "CAPTURE PARAMETERS URL [".serialize($_GET)."]");
                  foreach ($_GET as $key => $value) {
                      if(strpos($key, 'url')===false) {
                         $output[$key] = $value;
@@ -86,7 +86,7 @@ class AddressBook extends ObjetoWeb
          $output=[];
          try {
              
-             $this->log->addDebug($log_header . "DECOMPOSE URL [" . serialize($field) . "]");
+             $this->debug($log_header . "DECOMPOSE URL [" . serialize($field) . "]");
 
              // 1.- Prepare Field
              $field=rtrim($field, '/');
@@ -135,7 +135,7 @@ class AddressBook extends ObjetoWeb
      private function treatURL() {
          $log_header=$this->line_header . __METHOD__ ."()] - ";
          try {
-             $this->log->addDebug($log_header . "TREAT URL");
+             $this->debug($log_header . "TREAT URL");
              
              // 1.- Treat URL
              $this->captureURL();
@@ -152,7 +152,7 @@ class AddressBook extends ObjetoWeb
                  }
                  unset($properties['controller']);
              }
-             $properties['book']=this;
+             $properties['book']=$this;
              $this->controllerProperties=$properties;
              
          } catch (Exception $e) {
@@ -185,18 +185,18 @@ class AddressBook extends ObjetoWeb
          try {
 
              // 0.- Log Entry
-             $this->log->addDebug($log_header . "INITIATING ADDRESS BOOK url=[" . serialize($_GET) ."]");
+             $this->debug($log_header . "INITIATING ADDRESS BOOK url=[" . serialize($_GET) ."]");
              
              // 1.- Capture URL
              $this->treatURL();
              
              // 2.- Load Controller
-             $this->log->addDebug($log_header . "......CONTROLLER NAME [" . $this->controllerName . "]");
+             $this->debug($log_header . "......CONTROLLER NAME [" . $this->controllerName . "]");
              $this->controller=$this->createClass($this->controllerName,"/../controllers","Index");
              
              // 4.- Initiate Controller
              if (!($this->controller===false)) {
-                 $this->log->addDebug($log_header . "CONTROLLER PROPERTIES [" . serialize($this->controllerProperties) . "]");
+                 $this->debug($log_header . "CONTROLLER PROPERTIES [" . serialize($this->controllerProperties) . "]");
                  $this->controller->init($this->controllerProperties);
              }
              
@@ -224,7 +224,7 @@ class AddressBook extends ObjetoWeb
                 
                 // 1.- Trace Entry
                 $class=get_class($this->controller);
-                $this->log->addDebug($log_header . "START CONTROLLERS class=[$class]");
+                $this->debug($log_header . "START class=[$class]");
            
                 // 2.- Start Controller
                 $this->controller->start();

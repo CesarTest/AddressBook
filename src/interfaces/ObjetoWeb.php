@@ -299,9 +299,35 @@ class ObjetoWeb
           }
       }
 
+      /**
+       *
+       * @param \Exception $exception
+       * @param string $msg
+       */
+      protected function debug(String $msg, array $context=[]) 
+      {
+          if (!empty($msg)) {$this->log->addDebug($msg, $context);}
+      }
+      
+      protected function info(String $msg, array $context=[])
+      {
+          if (!empty($msg)) {$this->log->addInfo($msg, $context);}
+      }
+      
+      protected function warn(String $msg, array $context=[])
+      {
+          if (!empty($msg)) {$this->log->addWarning($msg, $context);}
+      }
+      
+      protected function error(String $msg, array $context=[])
+      {
+          if (!empty($msg)) {$this->log->addError($msg, $context);}
+      }
+      
+      
       
     /*----------------------------------
-     *           SETTER / GETTER
+     *           SETTER / GETTERs
      *----------------------------------*/
     /**
      * 
@@ -369,6 +395,7 @@ class ObjetoWeb
      * @param Logger $log
      */
     public function __construct(Logger $log=null){
+        $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {
             // 1.- Module Properties as Log Header
             $this->clase=get_class($this);
@@ -404,7 +431,7 @@ class ObjetoWeb
         try {
 
             // 0.- Trace Entry
-            $this->log->addDebug($log_header . "INITIATING OBJECT ... [" . $this->clase . "]");
+            $this->debug($log_header . "INITIATING.... [" . $this->clase . "]");
             
             // 1.- Set Object Properties
             $this->setProperties($input);
@@ -429,7 +456,7 @@ class ObjetoWeb
     public function start() {
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {
-            $this->log->addDebug($log_header . "....... STARTING OBJECT ........");
+            $this->debug($log_header . "STARTING..... [" . $this->clase . "]");
         } catch (Exception $e) {
             $this->treatException($e
                 , $log_header . "ERROR STARTING WEB OBJECT {$e->getMessage()}"

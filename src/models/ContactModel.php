@@ -20,7 +20,7 @@ class ContactModel extends Model
 
     public function addContact() {
         echo("AGREGANDO USUARIO.........");
-        //echo serialize(get_class_methods($this));
+        //echo serialize(get_class_methods());
         return true;
     }
     

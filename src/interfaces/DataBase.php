@@ -23,7 +23,6 @@ class DataBase extends ObjetoWeb
     protected $password;    
     protected $charset;
 
-    
     //----------------------------------------------
     // PRIVATE METHOD
     //----------------------------------------------
@@ -41,7 +40,7 @@ class DataBase extends ObjetoWeb
             ];
             
             // 2.- Start Connection
-            $this->log->addDebug($log_header . "CONNECTING TO DATABASE [$connection]");
+            $this->debug($log_header . "CONNECTING TO DATABASE [$connection]");
             $pdo = new PDO($connection, $this->user, $this->password, $options);
             $this->setPool($pdo);
             $success=true;
@@ -89,9 +88,8 @@ class DataBase extends ObjetoWeb
         
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {
-            
-            // 0.- Trace Entry
-            $this->log->addDebug($log_header . "STARTING CONNECTION TO DATABASE : [" . $this->clase . "]");
+
+            $this->debug($log_header . "STARTING..... [" . $this->clase . "]");
             $this->startConnection();
             
         } catch (Exception $e) {

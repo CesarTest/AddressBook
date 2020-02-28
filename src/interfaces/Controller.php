@@ -43,7 +43,7 @@ class Controller extends ObjetoWeb
             try {
 
                 // 1.1.- Log entry
-                $this->log->addDebug( $log_header . "Validate Type type=[$type],value=[$value],min=[$min], max=[$max]]");
+                $this->debug( $log_header . "Validate Type type=[$type],value=[$value],min=[$min], max=[$max]]");
                 
                 // 1.2.- Size Validation
                 if(empty($value) and ($min>0)) {
@@ -92,7 +92,7 @@ class Controller extends ObjetoWeb
                 // 2.- Capture from XML file
                 if(!empty($xmlFile)) {
                     if(file_exists($xmlFile)) {
-                        $this->log->addDebug( $log_header . "READING XML=[$xmlFile]");
+                        $this->debug( $log_header . "READING XML=[$xmlFile]");
                         $data=simplexml_load_file($xmlFile);
                         foreach ($data as $key => $value) {
                             $output[$key]['value']=$value;                                                        
@@ -132,7 +132,7 @@ class Controller extends ObjetoWeb
                 
                 // 1.2.- Capture Form                    
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                    $this->log->addDebug( $log_header . "CAPTURE FORM [". serialize($output) ."]");
+                    $this->debug( $log_header . "CAPTURE FORM [". serialize($output) ."]");
                     foreach($formFields as $key=>$value){
                         $valor  = $this->test_input($_POST[$key]);
                         $output[$key]['value']=$valor;
@@ -168,7 +168,7 @@ class Controller extends ObjetoWeb
                 // 1.1.- Detect Fields
                 if(empty($fields)){$fields=$this->view->getFields();}
                 $output=$fields;
-                $this->log->addDebug( $log_header . "VALIDATE FIELDS ");
+                $this->debug( $log_header . "VALIDATE FIELDS ");
                 
                 // 1.2.- Validate fields
                 foreach($fields as $key=>$value){
@@ -179,7 +179,7 @@ class Controller extends ObjetoWeb
                         ,$fields[$key]['label']);
                     
                     if (!empty($error)) {
-                        $this->log->addDebug( $log_header . "Input Error error=[". $error . "]");
+                        $this->debug( $log_header . "Input Error error=[". $error . "]");
                         $this->phpErrors("Validation", $error);
                         $formFields[$key]['value']=''; // Remove invalid field
                     }
@@ -219,7 +219,7 @@ class Controller extends ObjetoWeb
                 if (property_exists($this, view)) {$view=$this->view;}
                 if(!empty($view)) {
 
-                    $this->log->addDebug( $log_header . "  PHP ERRORS [$errorType] / [$errorMsg]");
+                    $this->debug( $log_header . "  PHP ERRORS [$errorType] / [$errorMsg]");
                     
                     // 1.- Set message
                     //-----------------
@@ -257,7 +257,7 @@ class Controller extends ObjetoWeb
             try { 
                 if(!empty($this->view)) {
                     $name=$this->view->getName();
-                    $this->log->addDebug($log_header . "LAUNCHING VIEW [$name]");
+                    $this->debug($log_header . "RENDERING VIEW [$name]");
                     $this->view->start();
                 }
             } catch (Exception $e) {
@@ -283,7 +283,7 @@ class Controller extends ObjetoWeb
             try {
                 
                 // 0.- Log Entry
-                $this->log->addDebug($log_header . "INITIATING CONTROLLER [$this->clase]");
+                $this->debug($log_header . "INITIATING CONTROLLER....... [$this->clase]");
                 
                 // 1.- Set Properties
                 if (!empty($properties)) {$this->setProperties($properties);}
@@ -342,8 +342,10 @@ class Controller extends ObjetoWeb
         public function start(){
            
             $log_header=$this->line_header . __METHOD__ ."()] - ";
-            $this->log->addDebug( $log_header . "LAUNCH COMMAND [" . $this->command . "]");
             try {
+                
+                $this->debug( $log_header . "STARTING CONTROLLER...... [" . $this->clase . "]");
+                
                 // 1.- Load Custom View
                 if(method_exists($this, $this->command)) { $this->{$this->command}(); }
                 
@@ -387,7 +389,6 @@ class Controller extends ObjetoWeb
                 $this->treatError($e
                     , $log_header . "ERROR SETTING VIEW "
                     );
-                
             }
         }
         
@@ -449,7 +450,6 @@ class Controller extends ObjetoWeb
                 $this->treatError($e
                     , $log_header . "ERROR GETTING MODEL "
                     );
-                
             }
         }
         

@@ -10,7 +10,11 @@ use Exception;
  */
 class BookModel extends Model
 {
-
+    
+    //--------------------------------
+    //       PUBLIC METHOD
+    //--------------------------------
+    
     /**
      *
      * @param Logger $log
@@ -21,18 +25,31 @@ class BookModel extends Model
     }
     
     public function list() {
+        echo "MODEL - LISTING USERS";
         $log_header=$this->line_header . __METHOD__ ."()] - ";
+        $contact=[[]];
         try {
-            echo "----- LISTING USERS ----- ";
+            $this->debug($log_header . "LISTING CONTACTS");
+
+            $contact=[[ 'Name' => 'Cesar'
+                ,'Surname'  => 'Delgado'
+                ,'Address'   => 'Cerrillo, 1'
+                ,'eMail'     => 'cesar@gmail.com'
+                ,'Phone'     => '694-456-774'
+            ]];
+            
         } catch (Exception $e) {
             $this->treatException($e
-                , $log_header . "ERROR STARTING CONTROLLER"
+                , $log_header . "ERROR LISTING USERS"
                 );
         } catch (Error $e) {
             $this->treatError($e
-                , $log_header . "ERROR STARTING CONTROLLER"
+                , $log_header . "ERROR LISTING USERS"
                 );
         }
+        
+        return $contact;
+        
     }
     
 }
