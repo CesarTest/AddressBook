@@ -7,12 +7,12 @@
 
 /* 1.-  User / Database */
 CREATE USER 'addressbook'@'localhost' IDENTIFIED BY 'password';
-CREATE database 'exercise';
+CREATE DATABASE exercise;
 GRANT ALL ON exercise.* TO 'addressbook'@'localhost' IDENTIFIED BY 'brainit';
 FLUSH PRIVILEGES;
 
 /* 2.-  Create Table (might work as "addressbook" user) */
-USE database "exercise";
+USE exercise;
 CREATE TABLE contact(
   contact_id INT NOT NULL AUTO_INCREMENT,
   lastname VARCHAR(50) NOT NULL,
