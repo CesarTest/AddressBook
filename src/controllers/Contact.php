@@ -87,7 +87,7 @@ class Contact extends Controller
             if(method_exists($this->view,"setFields")) {
                 $this->debug( $log_header . "LAUNCH [$this->clase] COMMAND" );
                 $address=$this->captureForm();
-                $address=$this->captureXMLfile($xml);
+                $address=$this->captureXMLfile($xml, $address);
                 $this->validateFields($address);
                 $success=(empty($this->view->getErrorMessage()));
             }

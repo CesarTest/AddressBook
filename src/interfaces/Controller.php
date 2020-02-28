@@ -80,14 +80,15 @@ class Controller extends ObjetoWeb
          * @param array $formFields
          * @return array
          */
-        protected function captureXMLfile(string $xmlFile="") {
+        protected function captureXMLfile(string $xmlFile="", array $fields=[]) {
             
             $log_header=$this->line_header . __METHOD__ ."()] - ";
-            $out=[];
+            $output=$fields;
             try {
 
                 // 1.- Init output
-                $output=$this->view->getFields();
+                if(empty($fields)){$fields=$this->view->getFields();}
+                $output=$fields;
                 
                 // 2.- Capture from XML file
                 if(!empty($xmlFile)) {
