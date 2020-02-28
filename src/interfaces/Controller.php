@@ -95,7 +95,7 @@ class Controller extends ObjetoWeb
                         $this->debug( $log_header . "READING XML=[$xmlFile]");
                         $data=simplexml_load_file($xmlFile);
                         foreach ($data as $key => $value) {
-                            $output[$key]['value']=$value;                                                        
+                            $output[$key]['value']=strval($value); 
                         }
                     }
                 }

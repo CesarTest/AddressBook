@@ -86,13 +86,14 @@ class Contact extends Controller
             if(!empty($this->xml)) { $xml=__DIR__."/../config/".$this->xml; }
             if(method_exists($this->view,"setFields")) {
                 $this->debug( $log_header . "LAUNCH [$this->clase] COMMAND" );
-                $this->view->setFields($this->captureForm());
-                $this->view->setFields($this->captureXMLfile($xml));
-                $this->view->setFields($this->validateFields());
+                $address=$this->captureForm();
+                $address=$this->captureXMLfile($xml);
+                $this->validateFields($address);
                 $success=(empty($this->view->getErrorMessage()));
             }
+            $this->view->setFields($address);           
             $this->view->setName("index");
-            if($success)   {$success=$this->model->addContact();}
+            if($success)   {$success=$this->model->addContact($address);}
             if($success)   {$this->view->setName("Success");}
             
         } catch (Exception $e) {

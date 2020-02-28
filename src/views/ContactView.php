@@ -43,6 +43,7 @@ class ContactView extends View
             // 0.- Trace Entry
             $this->debug($log_header . "INIT class=[$this->clase]");
             
+            
             // 1.- Set Child Properties
             $this->fields=[ 'firstname' => ['value'=>'', 'type'=>'varchar', 'min'=>'1', 'max'=>'50', 'label'=>'First Name' ] 
                     , 'lastname'  => ['value'=>'', 'type'=>'varchar', 'min'=>'1', 'max'=>'50', 'label'=>'Surname' ]

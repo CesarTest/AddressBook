@@ -58,7 +58,6 @@ class Book extends Controller
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {
             $this->debug($log_header . "LISTING BOOK.... [$this->clase]");
-            $this->view->setName("index");
             $this->view->setContact($this->model->list());
             
         } catch (Exception $e) {

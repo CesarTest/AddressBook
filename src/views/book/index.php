@@ -20,17 +20,21 @@
     	    $header="<thead>";
     	    $body="<tbody>";
     	    $first=true;
+    	    //var_dump($this->contact);
     	    foreach ($this->contact as $address ) {
-    	        $body=$body."<tr>".$newline;
-    	        if($first) {$header=$header."<tr>";}
-    	        foreach ( $address as $key => $value ) {
-    	            if ($first) {$header=$header."<td>".$key."</td>";}
-    	            $body=$body."<td>".$value."</td>";
+    	        if(!empty($address)) {
+        	        $body=$body."<tr>".$newline;
+        	        if($first) {$header=$header."<tr>";}
+        	        foreach ( $address as $value ) {
+        	            if ($first) {$header=$header."<td>".$value['label']."</td>";}
+        	            $body=$body."<td>".$value['value']."</td>";
+        	        }
+        	        if($first) {$header=$header."</tr>".$newline;}
+        	        $body=$body."</tr>".$newline;
+        	        $first=false;
     	        }
-    	        if($first) {$header=$header."</tr><thead>".$newline;}
-    	        $body=$body."</tr>".$newline;
-    	        $first=false;
     	    }
+    	    $header=$header."</thead>";
     	    $body=$body."</tbody>";
     	}
     	

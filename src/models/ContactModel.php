@@ -19,9 +19,34 @@ class ContactModel extends Model
     }
 
     public function addContact() {
-        echo("AGREGANDO USUARIO.........");
-        //echo serialize(get_class_methods());
-        return true;
+        $log_header=$this->line_header . __METHOD__ ."()] - ";
+        $success=false;
+        try {
+            $vista=$this->getController()->getView();
+            $address=$vista->getFields();            
+            $this->debug($log_header . "ADDING CONTACT - [" . $address['firstname'] . "]");
+            var_dump($address['firstname']['value']);
+            $pool=$this->connection->getPool();
+            $query=$pool->prepare('INSERT INTO contact (firstname, lastname, address, email, phone) VALUES(:firstname, :lastname, :address, :email, :phone)');  
+            $success=$query->execute([
+                          'firstname' => $address['firstname']['value']
+                        , 'lastname'  => $address['lastname']['value']
+                        , 'address'   => $address['address']['value']
+                        , 'email'     => $address['email']['value']
+                        , 'phone'     => $address['phone']['value']
+                        ]);
+            
+        } catch (Exception $e) {
+            $this->treatException($e
+                , $log_header . "ERROR LISTING USERS"
+                );
+        } catch (Error $e) {
+            $this->treatError($e
+                , $log_header . "ERROR LISTING USERS"
+                );
+        }
+        
+        return $success;
     }
     
 }
