@@ -6,7 +6,7 @@
 		<meta http-equiv="X-UA-Compatible" content="ie=edge">
 		<title>Address Book</title>
 </head>
-<body>
+<body class="cuerpo">
 
     <?php require 'views/header.php'; ?>
 
