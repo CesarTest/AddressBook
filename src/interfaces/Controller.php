@@ -217,7 +217,7 @@ class Controller extends ObjetoWeb
             $view;
             try {
                 
-                if (property_exists($this, view)) {$view=$this->view;}
+                if (property_exists($this, $view)) {$view=$this->view;}
                 if(!empty($view)) {
 
                     $this->debug( $log_header . "  PHP ERRORS [$errorType] / [$errorMsg]");
@@ -316,13 +316,14 @@ class Controller extends ObjetoWeb
                 }
                 
                 // 6.- Init Model
-                if (method_exists($this->model, "init")) {
-                    $this->model->init($properties);
-                } else {
-                    $tmp=get_class($this->model);
-                    $this->log->addError($log_header . "INIT METHOD NOT FOUND IN MODEL [$tmp]");
+                if(!is_null($this->model)) {
+                    if (method_exists($this->model, "init")) {
+                        $this->model->init($properties);
+                    } else {
+                        $tmp=get_class($this->model);
+                        $this->log->addError($log_header . "INIT METHOD NOT FOUND IN MODEL [$tmp]");
+                    }
                 }
-                
             } catch (Exception $e) {
                 $this->treatException($e
                     , $log_header . "ERROR INITIATING CONTROLLER"

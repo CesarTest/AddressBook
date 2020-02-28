@@ -6,4 +6,3 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-l
 RewriteRule ^index.(.*)?$ http://%{SERVER_NAME}/cesar_delgado/src/ [r=301]
-RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]

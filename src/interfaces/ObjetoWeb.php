@@ -425,7 +425,7 @@ class ObjetoWeb
      * 
      * @param array $input
      */
-    public function init(array $input=null) {
+    public function init(array $input=[]) {
  
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {

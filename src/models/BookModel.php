@@ -1,7 +1,5 @@
 <?php 
 use Monolog\Logger;
-use Error;
-use Exception;
 
 /**
  *
