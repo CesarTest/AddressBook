@@ -1,6 +1,5 @@
 <?php
 
-if (!isset($app)) {
     
         /*----------------------------------
          *      GLOBAL STATIC PROPERTIES
@@ -8,7 +7,7 @@ if (!isset($app)) {
         $libs=__DIR__ . "/interfaces";
         $line_header="[cesar.addressbook.index.php->";
         $log_header=$line_header . "main]";
-            
+        
         /*----------------------------------
          *         LIBRARIES
          *----------------------------------*/
@@ -49,7 +48,7 @@ if (!isset($app)) {
         $log->addDebug($log_header . "....... log=[$out]");
         
         // 2.- Launch Application
-        try {
+       try {
                 $app=new AddressBook();
                 $app->setLog($log);
                 $app->init();
@@ -61,5 +60,5 @@ if (!isset($app)) {
             $log->addError($e->getMessage());
             $log->addError($e->getTraceAsString());
         }
-}
+
 ?>

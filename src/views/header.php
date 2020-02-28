@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Cesar Delgado - Simple PHP Address Book</title>
-        <link rel="stylesheet" href="<?php echo constant('URL'); ?>public/css/basico.css">
+        <link rel="stylesheet" href="<?php echo constant('URL'); ?>html/css/basico.css">
      </head>
 <body class="cuerpo">
     <div id="header">
