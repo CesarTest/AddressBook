@@ -13,6 +13,7 @@ namespace Monolog\Handler;
 
 use Monolog\TestCase;
 use Monolog\Logger;
+use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 
 class FingersCrossedHandlerTest extends TestCase
 {
@@ -132,5 +133,37 @@ class FingersCrossedHandlerTest extends TestCase
         $test = new TestHandler();
         $handler = new FingersCrossedHandler($test, Logger::ERROR);
         $this->assertTrue($handler->isHandling($this->getRecord(Logger::DEBUG)));
+    }
+
+    /**
+     * @covers Monolog\Handler\FingersCrossedHandler::__construct
+     */
+    public function testActivationStrategy()
+    {
+        $test = new TestHandler();
+        $handler = new FingersCrossedHandler($test, new ErrorLevelActivationStrategy(Logger::WARNING));
+        $handler->handle($this->getRecord(Logger::DEBUG));
+        $this->assertFalse($test->hasDebugRecords());
+        $handler->handle($this->getRecord(Logger::WARNING));
+        $this->assertTrue($test->hasDebugRecords());
+        $this->assertTrue($test->hasWarningRecords());
+    }
+
+    /**
+     * @covers Monolog\Handler\FingersCrossedHandler::handle
+     */
+    public function testHandleUsesProcessors()
+    {
+        $test = new TestHandler();
+        $handler = new FingersCrossedHandler($test, Logger::INFO);
+        $handler->pushProcessor(function ($record) {
+            $record['extra']['foo'] = true;
+
+            return $record;
+        });
+        $handler->handle($this->getRecord(Logger::WARNING));
+        $this->assertTrue($test->hasWarningRecords());
+        $records = $test->getRecords();
+        $this->assertTrue($records[0]['extra']['foo']);
     }
 }
