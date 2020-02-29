@@ -1,30 +1,37 @@
 <?xml version="1.0"?>
-<project name="addressBook" default="Launch" basedir=".">
+<project name="addressBook" default="Doc" basedir=".">
 
 	<!-- ========================================================= -->
 	<!--                    GLOBAL ENVIRONMENT                     -->
 	<!-- ========================================================= -->
 
 	<!-- ================= Common to all projects ================ -->
-	<!-- ... 1.- Project Folders  -->
-	<property name="source"    location="src"/>
-	<property name="logs"  	   location="logs"/>
-	<property name="test"      location="test"/>	
-	<property name="doc"       location="doc"/>
+	<!-- 1.- Project Paths -->
+	<property name="path"      value="."/>
+	<property name="source"    value="${path}/src"/>
+	<property name="logs"  	   value="${path}/logs"/>
+	<property name="test"      value="${path}/test"/>	
+	<property name="doc"       value="${path}/doc"/>
+	<property name="phar"      value="${path}/phar"/>
 
-	<!-- ... 2.- PHP Folders (missing automatic detection)  -->
-	<property name="nodeExec"        value="node"/>
-	<property name="nodeOptions"     value="--harmony"/>
-	<property name="composerExec"    value="composer"/>
-	<property name="composerOptions" value="install"/>
+	<!-- 2.- Project Properties -->
+	<property name="name"      value="addressbook"/>
+
 	
-	<!-- ... 3.- PHPDoc Folders (missing automatic detection)  -->
-	<property name="jsDocLocalPath"  location="${lib}/.bin"/>
-	<property name="jsDocLocalExec"  location="${jsDocLocalPath}/jsdoc"/>
-	<property name="jsDocGlobalPath" location="/usr/local/lib/node_modules/jsdoc"/>
-	<property name="jsDocExec"       location="${jsDocGlobalPath}/jsdoc.js"/>
-	<property name="jsDocConf"       location="${config}/jsdoc.json"/>
-
+	<!-- 3.- PHP Documentor 2 Properties -->
+	<property name="template"      value="responsive-twig"/>
+	<property name="title"         value="Address Book Documentation"/>
+	<property name="searchPattern" value="**/*.php"/>
+	
+	<!-- 4.- PHAR Properties -->
+	<property name="package"      value="${phar}/${name}.phar"/>	
+	<property name="compression"  value="gzip"/>
+	<property name="version"      value="1.0"/>
+	<property name="author"       value="Cesar Delgado"/>
+	<property name="email"        value="contact@cesar-delgado.info"/>
+	<property name="stub"         value="stub.php"/>
+	
+	
 	<!-- =============== Specific to this project =============== -->
 
 	<!-- =============== Not Used, sytax reminder =============== -->
@@ -64,17 +71,57 @@
 	<!-- ================== Cleaning Environment =================== -->
     <target name="CleanLogs" depends="init" description="Cleaning log files">
 			<echo>+ ============================================= </echo>
-			<echo>+ CLEANING: logs, docs... "${package}"          </echo>
+			<echo>+ CLEANING LOGS: ... [${logs}]"                   </echo>
 			<echo>+ ============================================= </echo>
 	        <delete dir="${logs}" />
 	        <mkdir  dir="${logs}" />
     </target>
 
-
+    <target name="CleanPhar" depends="init" description="Cleaning log files">
+			<echo>+ ============================================= </echo>
+			<echo>+ CLEANING PHAR: ... [${phar}]"                 </echo>
+			<echo>+ ============================================= </echo>
+	        <delete dir="${phar}" />
+	        <mkdir  dir="${phar}" />
+    </target>
+	
+	<!-- ================== Packing Project =================== -->
+	<target name="Phar" depends="CleanPhar">
+		
+		<echo>+ =============================================   </echo>
+		<echo>+ PHAR PACKING PROJECT .......... [${name}]       </echo>
+		<echo>+ ->Destination File............. [${package}]    </echo>
+		<echo>+ ->Compression.................. [${compression}]</echo>
+		<echo>+ ->Basedir: Source Code......... [${source}]      </echo>
+		<echo>+ ->Search Pattern............... [${searchPattern}] </echo>
+		<echo>+ ->Stub: Compliance Test File... stub.php          </echo>
+		<echo>+ ->Version...................... [${version}]      </echo>
+		<echo>+ ->Author....................... [${author}]       </echo>
+		<echo>+ ->eMail........................ [${email}]        </echo>
+		<echo>+ =============================================     </echo>
+		<pharpackage
+				compression="${compression}"
+				destfile="${package}"
+				stub="stub.php"
+				basedir="${path}">
+				<fileset dir="${source}">
+					<include name="${searchPattern}" />
+				</fileset>
+				<metadata>
+					<element name="version" value="${version}" />
+					<element name="authors">
+						<element name="${author}">
+							<element name="email" value="${email}" />
+						</element>
+					</element>
+				</metadata>
+			</pharpackage>
+		</target>
+	
+	
 	<!-- ======================================================== -->
 	<!--   SPECIFIC SECTION : DIFFERENT FROM PROJECT TO PROJECT   -->
 	<!-- ======================================================== -->
-
 	
 	<!-- ================ Install Windows Dependencies =============== -->
 	<target name="winInstallDependencies" depends="CheckOS"  if="isWindows" description="Install Dependencies in Windows">
@@ -83,11 +130,6 @@
 		<echo>+ ->Executable: Composer... ${composerExec}"        </echo>	
 		<echo>+ ->Options: .............. ${composerOptions}"     </echo>	
 		<echo>+ ============================================= </echo>	
-		<exec executable="cmd" failonerror="true" dir="${basedir}">
-		    <arg value="/c"/>
-		    <arg value="${composerExec} ${composerOptions}"/>
-			<arg value="-p"/>
-		</exec>			
 	</target>	
 	
 	
@@ -98,17 +140,12 @@
 		<echo>+ ->Executable: Composer... ${composerExec}"    </echo>	
 		<echo>+ ->Options: .............. ${composerOptions}" </echo>	
 		<echo>+ ============================================= </echo>	
-		<exec executable="bash" failonerror="true" dir="${basedir}">
-			<arg value="-p"/>			
-		    <arg value="${composerExec} ${composerOptions}"/>
-		</exec>			
 	</target>		
 	
 	<!-- ================ Install Dependencies =============== -->	
 	<target name="installDependencies" description="Install Dependencies, in Windows or Unix"
 	    depends="unixInstallDependencies, winInstallDependencies">
 	</target>	
-		
 	
 	<!-- =================== Launching Project ================== -->
 	<target name="Launch" depends="init" description="Launching Node.js video chat">
@@ -124,16 +161,6 @@
 		<echo>+ ->Param: Verbose Mode.... "${verbose}"        </echo>
 		<echo>+ ->Param: Help............ "${help}"           </echo>
 		<echo>+ ============================================= </echo>
-		<exec executable="${nodeExec}">
-			<arg value="${nodeOptions}"/>
-			<arg value="${launchScript}"/>
-			<arg value="${help}"/>
-	        <arg value="${port}"/>
-			<arg value="${logFile}"/>
-			<arg value="${logType}"/>
-			<arg value="${logLevel}"/>
-    		<arg value="${verbose}"/>
-		</exec>
 
 	</target>
 
@@ -141,55 +168,29 @@
     <target name="CleanDoc" depends="init"
     	    description="Cleaning Documentation ...">
 			<echo>+ =============================================     </echo>
-			<echo>+ CLEANING PHPDocumentor... "${docServer}" </echo>
+			<echo>+ CLEANING PHPDocumentor... [${doc}]                </echo>
 			<echo>+ =============================================     </echo>
-    	    <delete dir="${docServer}"/>
-    	    <mkdir  dir="${docServer}"/>
+    	    <delete dir="${doc}"/>
+    	    <mkdir  dir="${doc}"/>
     </target>
 
 
-	<!-- ================ Windows Documentation =============== -->
-	<target name="winDoc" depends="CleanDoc, CheckOS"  if="isWindows"
-	                       description="Generating Server Documentationin Windows ...">
-		<echo>+ ============================================= </echo>
-		<echo>+ WINDOWS - GENERATING PHPDOCUMENTOR documents...           </echo>
-		<echo>+ ${jsDocLocalExec}.cmd -r ${server} --configure ${jsDocConf} --destination ${docServer} --debug</echo>
-		<echo>+ ---------------------------------------------  </echo>
-		<echo>+ Description:                                   </echo>
-		<echo>+ ->JSDoc Exec..........  "${jsDocLocalExec}" </echo>
-		<echo>+ ->JSDoc Conf..........  "${jsDocConf}"         </echo>
-		<echo>+ ->InputFolder Folder..  "${server}"            </echo>
-		<echo>+ ->Output Folder.......  "${docServer}"         </echo>
-		<echo>+ =============================================  </echo>
-		<exec executable="cmd" failonerror="true" dir="${server}">
-		    <arg value="/c"/>
-		    <arg value="${jsDocLocalExec}.cmd --recurse ${server} --configure ${jsDocConf} --destination ${docServer} --debug --package ${package}"/>
-			<arg value="-p"/>
-		</exec>
-	</target>
-
-	<!-- ================ Unix Documentation =============== -->
-	<target name="unixDoc" depends="CleanDoc, CheckOS" if="isUnix"
-	                       description="Generating Server Documentation in Unix ...">
-		<echo>+ ============================================= </echo>
-		<echo>+ UNIX - GENERATING PHPDOCUMENTOR documents...           </echo>
-		<echo>+ ${jsDocExec} -r ${server} --configure ${jsDocConf} --destination ${docServer} --debug --package ${package}</echo>
-		<echo>+ ---------------------------------------------  </echo>
-		<echo>+ Description:                                   </echo>
-		<echo>+ ->JSDoc Exec..........  "${jsDocExec}"         </echo>
-		<echo>+ ->JSDoc Conf..........  "${jsDocConf}"         </echo>
-		<echo>+ ->InputFolder Folder..  "${server}"            </echo>
-		<echo>+ ->Output Folder.......  "${docServer}"         </echo>
-		<echo>+ =============================================  </echo>
-		<exec executable="bash" failonerror="true" dir="${server}">
-			 <arg value="-c"/>
-		    <arg value="${jsDocExec} --recurse ${server} --configure ${jsDocConf} --destination ${docServer} --debug --package ${package}"/>
-		</exec>
-	</target>
-
 	<!-- ================ Documentation =============== -->
-	<target name="Doc" description="Generate Documentation, in Windows or Unix"
-	    depends="unixDoc, winDoc">
+	<target name="Doc" depends="CleanDoc"  
+	                       description="Generating AddressBook Documentation">
+		<echo>+ ============================================= </echo>
+		<echo>+ GENERATING DOCUMENTATION ...                  </echo>
+		<echo>+ Description:                                  </echo>
+		<echo>+ ->InputFolder Folder..[${source}]             </echo>
+		<echo>+ ->Output Folder.......[${doc}]                </echo>
+		<echo>+ ============================================= </echo>
+		<phpdoc2 
+			destdir="${doc}"
+			template="${template}"
+			title="${title}">
+			<fileset dir="${source}">
+				 <include name="${searchPattern}" />
+			</fileset>
+		</phpdoc2>
 	</target>
-
 </project>
