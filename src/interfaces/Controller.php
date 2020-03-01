@@ -2,7 +2,29 @@
 namespace book\interfaces;
 
 /**
+ *  CONTROLLER
  *
+ *  Responsabilities:
+ *  <table>
+ *     <tr><td>1.- Init(): Spawn and Init View and Model</td></tr>
+ *     <tr><td>2.- Start(): Run Command & Render</td></tr>
+ *     <tr><td>3.- PHP Error Handling... errors that user should see</td></tr>
+ *     <tr><td>4.- Validate POST fields</td></tr>
+ *  </table>
+ *  
+ *  Note: 
+ *    a.- Data beans should be encapsulated in the model,
+ *    <ul>
+ *        <li>View-> Give me my model (to the controller).</li>
+ *        <li>Controller -> Here your model</li>
+ *        <li>View-> Give me my bean (to the model)</li>
+ *        <li>Model-> Here your bean</li>
+ *        <li>View -> Give me my array of fields (to the bean)</li>
+ *        <li>Bean -> Here your fields</li>
+ *        <li>View -> Now I can construct any formulary</li>
+ *     </ul>
+ *     Same logic to create all formularies of the application 
+ *              
  * @author Cesar Delgado
  *        
  */
@@ -53,12 +75,13 @@ class Controller extends ObjetoWeb
          * PRIVATE METHODS
          *----------------------------------*/
         /**
+         * Fiel Validation according
          * 
-         * @param string $type
-         * @param string $value
-         * @param int $min
-         * @param int $max
-         * @return string
+         * @param string $type Data Type
+         * @param string $value Contents to validate
+         * @param int $min Min size allow
+         * @param int $max Max Size allow
+         * @return string Error Message
          */
         private function test_type(string $type='varchar', string $value='', int $min=0, int $max=0, string $field) {
 
@@ -102,7 +125,8 @@ class Controller extends ObjetoWeb
         }
 
         /**
-         *
+         * Load XML File
+         * 
          * @param array $formFields
          * @return array
          */
@@ -142,6 +166,8 @@ class Controller extends ObjetoWeb
         
         
         /**
+         * Capture formularies 
+         *    (still not using beans, just array created in the view)  
          * 
          * @param array $formFields
          * @return array
@@ -182,6 +208,8 @@ class Controller extends ObjetoWeb
  
         /**
          *
+         * Validate array of fields.
+         * 
          * @param array $formFields
          * @return array
          */
@@ -231,6 +259,7 @@ class Controller extends ObjetoWeb
          *----------------------------------*/
         
         /**
+         *  Switch view to present error message
          *
          * @param string $errorType
          * @param string $errorMsg
@@ -277,7 +306,7 @@ class Controller extends ObjetoWeb
         }
         
         /**
-         *
+         *  Set view name and start the view.
          */
         public function render(){
             $log_header=$this->line_header . __METHOD__ ."()] - ";
@@ -299,7 +328,7 @@ class Controller extends ObjetoWeb
         }
 
         /**
-         *  Initiate Default View
+         *  Initiate Model, then the View... in this order
          *
          * {@inheritDoc}
          * @see ObjetoWeb::init()

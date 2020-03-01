@@ -115,11 +115,19 @@ class AddressBook extends ObjetoWeb
              $this->debug($log_header . "DECOMPOSE URL [" . serialize($field) . "]");
 
              // 1.- Prepare Field
+             //-------------------
              $field=rtrim($field, '/');
+             
+             // 1.1.- Field ? spam => remove spam
+             $properties=explode('?', $field);
+             if(!empty($properties)) {$field=$properties[0];}
+             
+             // 1.2.- Field= / value / value ... get array
              $properties=explode('/', $field);
              if(empty($properties)) {$properties[0]=$field;}
              
              // 2.- Capture fields
+             //-------------------
              $nprop = sizeof($properties);
              $nkeys = sizeof($keys);
              $output= [];
