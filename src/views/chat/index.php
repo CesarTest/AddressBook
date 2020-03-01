@@ -12,6 +12,12 @@
 
     <div id="main">
         <h1 class="center">WebRTC Video Chat!</h1>
+               <iframe id="WebRTC Chat"
+                     title="VideoChat"
+                     width="100%"
+                    height="1000"
+                      src="http://cesar.eu-4.evennode.com/">
+                </iframe>
     </div>
 
     <?php require 'views/footer.php'; ?>

@@ -19,7 +19,7 @@
         		?>
     		</div>
     		
-            <form action="<?php echo constant('URL'); ?>contact/newAddress" method="POST">
+            <form action="<?php echo constant('URL'); ?>index.php?url=contact&command=newAddress" method="POST">
             	<?php 
             	$fields=$this->fields;
             	foreach($fields as $key=>$value){ 

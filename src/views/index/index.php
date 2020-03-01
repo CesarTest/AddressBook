@@ -16,6 +16,7 @@
         	Here we research the Model-Viewer-Controller archetype,
         	the undelying model behing many PHP Frameworks.
         </p>
+        
     </div>
 
     <?php require 'views/footer.php'; ?>

@@ -12,7 +12,7 @@
         <ul>
             <li><a href="<?php echo constant('URL'); ?>index">Welcome!</a></li>
             <li><a href="<?php echo constant('URL'); ?>grav">Grav Documentation</a></li>
-            <li><a href="<?php echo constant('URL'); ?>pdf">PDF Documentation</a></li>
+            <li><a href="<?php echo constant('URL'); ?>pdf">API Documentation</a></li>
             <li><a href="<?php echo constant('URL'); ?>chat">WebRTC VideoChat</a></li>
             <li><a href="<?php echo constant('URL'); ?>book">Address Book</a></li>
             <li><a href="<?php echo constant('URL'); ?>contact">Add Contact</a></li>           

@@ -417,7 +417,7 @@ class ObjetoWeb
             $list=explode('\\',$full);
             $last=end($list);
             $this->clase=$last;
-            $this->line_header="[" . $class . "->" ;
+            $this->line_header="[" . $full . "->" ;
             
             // 2.- Set Logger
             if(empty($this->log)) {$this->setLog(new Logger($this->clase));}

@@ -39,9 +39,30 @@ class AddressBook extends ObjetoWeb
          $log_header=$this->line_header . __METHOD__ ."()] - ";
          $success=false;
          try {
-             $this->debug($log_header . "CAPTURE URL");
-             $this->url=null;
+    
+             // 1.- GET URL
+             $uri=$_SERVER['REQUEST_URI'];
+             $name=$_SERVER['SERVER_NAME'];
+             $url_in=$name . $uri; 
+             $url=URL;
+             
+             // 2.- Filter request
+             if (!empty($url)) {
+                 
+                 // 2.1.- Base URL
+                 $url=str_replace("http://", "", $url);
+                 $url_base=str_replace("https://", "", $url);
+                 
+                 // 2.2.- Extract URL
+                 $this->debug($log_header . ".......GET URL = [".$url_in."]");
+                 $this->debug($log_header . "config.php URL = [".$url_base."]");
+                 $this->url = str_replace($url_base, "", $url_in);
+                 $success=true;
+             }
+             
+             // 3.- Capture as parameter
              if (isset($_GET['url'])) {$success=true; $this->url=$_GET['url'];}
+             
              
          } catch (Exception $e) {
              $this->treatException($e
@@ -194,6 +215,10 @@ class AddressBook extends ObjetoWeb
              $this->debug($log_header . "INITIATING ADDRESS BOOK url=[" . serialize($_GET) ."]");
              
              // 1.- Capture URL
+             var_dump($_GET); // Element 'foo' is string(1) "a"
+             var_dump($_POST); // Element 'bar' is string(1) "b"
+             var_dump($_SERVER); // Does not contain elements 'foo' or 'bar'
+             
              $this->treatURL();
             
              // 2.- Load Controller
