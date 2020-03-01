@@ -215,10 +215,6 @@ class AddressBook extends ObjetoWeb
              $this->debug($log_header . "INITIATING ADDRESS BOOK url=[" . serialize($_GET) ."]");
              
              // 1.- Capture URL
-             var_dump($_GET); // Element 'foo' is string(1) "a"
-             var_dump($_POST); // Element 'bar' is string(1) "b"
-             var_dump($_SERVER); // Does not contain elements 'foo' or 'bar'
-             
              $this->treatURL();
             
              // 2.- Load Controller
