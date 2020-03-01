@@ -1,9 +1,6 @@
-RewriteEngine On
+<IfModule mod_rewrite.c>
 
-#RewriteCond %{REQUEST_FILENAME} !-d
-#RewriteCond %{REQUEST_FILENAME} !-f
-#RewriteCond %{REQUEST_FILENAME} !-l
-#RewriteRule ^(.*)$ index.php?url=$1 [L,QSA]
+RewriteEngine On
 
 ## Begin - Index
 # If the requested path and file is not /index.php and the request
@@ -16,3 +13,11 @@ RewriteCond %{REQUEST_FILENAME} !-d
 # internally rewrite the request to the index.php script
 RewriteRule .* index.php [L]
 ## End - Index
+
+## Begin - Redirect HTTPS to HTTP
+RewriteCond %{HTTPS} on
+# or RewriteCond %{SERVER_PORT} ^443$
+RewriteRule .? http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+## End - Redirect HTTPS to HTTP
+
+</IfModule>

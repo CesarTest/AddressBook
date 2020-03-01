@@ -9,6 +9,5 @@
 	"require-dev" : {
 		"phpunit/phpunit" : "6.0.0",
 		"phpdocumentor/phpdocumentor" : "2.*"
-		
 	}
 }

@@ -1,3 +1,5 @@
+<IfModule mod_rewrite.c>
+
 RewriteEngine On
 
 # Redirect to Subfolder
@@ -6,3 +8,10 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-l
 RewriteRule ^index.(.*)?$ http://%{SERVER_NAME}/cesar_delgado/src/ [r=301]
+
+## Begin - Redirect HTTPS to HTTP
+RewriteCond %{HTTP:X-Forwarded-Proto} =https
+RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+## End - Redirect HTTPS to HTTP
+
+</IfModule>
