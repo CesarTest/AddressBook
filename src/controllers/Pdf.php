@@ -1,12 +1,15 @@
-<?php
+<?php namespace book\controllers;
+
+use book\interfaces\Controller;
+use Monolog\Logger;
+
 /**
  *
  * @author cesar
  *        
  */
-use Monolog\Logger;
 
-class Pdf extends \Controller
+class Pdf extends Controller
 {
 
     /**

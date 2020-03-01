@@ -1,9 +1,14 @@
-<?php
+<?php 
+namespace book\models;
+
+use book\interfaces\Model;
 use Monolog\Logger;
+use Error;
+use Exception;
 
 /**
  *
- * @author cesar
+ * @author Cesar Delgado
  *        
  */
 class ContactModel extends Model
@@ -24,8 +29,7 @@ class ContactModel extends Model
         try {
             $vista=$this->getController()->getView();
             $address=$vista->getFields();            
-            $this->debug($log_header . "ADDING CONTACT - [" . $address['firstname'] . "]");
-            var_dump($address['firstname']['value']);
+            $this->debug($log_header . "ADDING CONTACT - [" . serialize($address) . "]");
             $pool=$this->connection->getPool();
             $query=$pool->prepare('INSERT INTO contact (firstname, lastname, address, email, phone) VALUES(:firstname, :lastname, :address, :email, :phone)');  
             $success=$query->execute([

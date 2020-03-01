@@ -1,12 +1,16 @@
-<?php
+<?php 
+namespace book\views;
+use book\interfaces\ObjetoWeb;
+use book\interfaces\View;
+use Monolog\Logger;
+use Exception;
+use Error;
 
 /**
  *
  * @author Cesar Delgado
  *        
  */
-use Monolog\Logger;
-
 class ContactView extends View
 {
 
@@ -70,7 +74,7 @@ class ContactView extends View
     //       GETTER / SETTER
     //--------------------------------
     /**
-     * @return \src\models\beans\Address
+     * @return array
      */
     public function getFields()
     {
@@ -78,7 +82,7 @@ class ContactView extends View
     }
     
     /**
-     * @param \src\models\beans\Address $address
+     * @param array $address
      */
     public function setFields($address)
     {

@@ -1,4 +1,6 @@
-<?php
+<?php namespace book\controllers;
+
+use book\interfaces\Controller;
 use Monolog\Logger;
 
 /**
@@ -6,7 +8,7 @@ use Monolog\Logger;
  * @author cesar
  *        
  */
-class Chat extends \Controller
+class Chat extends Controller
 {
 
     /**

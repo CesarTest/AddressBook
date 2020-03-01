@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit21b685921dd0ff16ad7e4e1e56d719ba
+class ComposerStaticInitf91c3dfce158f02357f7b30ae38d93f2
 {
     public static $files = array (
         '10a6847eba8a430a134fad89f4a30a26' => __DIR__ . '/..' . '/zendframework/zend-cache/autoload/patternPluginManagerPolyfill.php',
@@ -745,10 +745,10 @@ class ComposerStaticInit21b685921dd0ff16ad7e4e1e56d719ba
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit21b685921dd0ff16ad7e4e1e56d719ba::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit21b685921dd0ff16ad7e4e1e56d719ba::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit21b685921dd0ff16ad7e4e1e56d719ba::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit21b685921dd0ff16ad7e4e1e56d719ba::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitf91c3dfce158f02357f7b30ae38d93f2::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitf91c3dfce158f02357f7b30ae38d93f2::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitf91c3dfce158f02357f7b30ae38d93f2::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitf91c3dfce158f02357f7b30ae38d93f2::$classMap;
 
         }, null, ClassLoader::class);
     }

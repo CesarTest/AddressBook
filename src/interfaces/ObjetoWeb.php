@@ -1,15 +1,21 @@
-<?php
-use Monolog\Logger;
-
+<?php 
+namespace book\interfaces;
 
 /**
  *
  * @author Cesar Delgado
  *        
  */
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Error;
+use Exception;
+use book;
+
 class ObjetoWeb
 {
-
+    
+    
     /*----------------------------------
      *        PRIVATE PROPERTIES
      *----------------------------------*/
@@ -41,8 +47,8 @@ class ObjetoWeb
         $object=false;
         try {
             $this->log->addDebug($log_header . "SPAWN OBJECT class=[" . $class . "]");
-            $object = new $class;
-            if(!empty($this->log))  {$object->setLog($this->log);}
+            $object=new $class;
+            $object->setLog($this->log);
         } catch (Exception $e) {
             $this->treatException($e
                 , $log_header . "FAIL SPAWING OBJECT"
@@ -97,7 +103,12 @@ class ObjetoWeb
             // 1.2.- Loading Class
             if(file_exists($moduleFile)) {
                 $this->log->addDebug($log_header . "LOADING CLASS MODULE: [$moduleFile]");
-                require $moduleFile;
+                /*$success=spl_autoload_register(function($moduleFile) {
+                    echo "Entrando $moduleFile";
+                    require_once $moduleFile;
+                    throw new Exception("UNABLE TO LOAD  [$moduleFile]");
+                });*/
+                require_once $moduleFile;
                 $out=$class;
             } else {
                 $this->log->addError($log_header . "CLASS MODULE NOT FOUND : [$moduleFile]");
@@ -121,6 +132,7 @@ class ObjetoWeb
 
     protected function createClass(string  $module="View"
                                  , string  $path="" 
+                                 , string  $namespace=__NAMESPACE__
                                  , string  $default="none"
                                  , string  $error="none"
                                 )
@@ -136,9 +148,12 @@ class ObjetoWeb
             $this->log->addDebug($log_header . "CREATE CLASS module=[" . $module . "]");
             
             // 1.1.- Spawn Object
-            $class=$this->loadModule($module,$path,$default,$error);
-            if(!($class===false)) {$object=$this->spawnObject($class);}
-            
+            $class=$this->loadModule($module,$path,$default,$error);       
+            if(!($class===false)) {
+                $full=$namespace . "\\" . $class;
+                $object=$this->spawnObject($full);
+            }
+  
             // 1.2.- Set Property
             if (!($object===false)) {
                 $property=strtolower($module);
@@ -398,8 +413,11 @@ class ObjetoWeb
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         try {
             // 1.- Module Properties as Log Header
-            $this->clase=get_class($this);
-            $this->line_header="[" . __NAMESPACE__ . $this->clase . "->" ;
+            $full=get_class($this);
+            $list=explode('\\',$full);
+            $last=end($list);
+            $this->clase=$last;
+            $this->line_header="[" . $class . "->" ;
             
             // 2.- Set Logger
             if(empty($this->log)) {$this->setLog(new Logger($this->clase));}
@@ -500,7 +518,7 @@ class ObjetoWeb
              *----------------------------------*/
             $log = new Logger($name);
             if ( ($permission & 0x0080) | ($permission & 0x0002)) {
-                $log->pushHandler(new Monolog\Handler\StreamHandler($logfile, Monolog\Logger::DEBUG));
+                $log->pushHandler(new StreamHandler($logfile, Logger::DEBUG));
                 $log->addDebug($log_header . "LOGGING SYSTEM CORRECTLY INITIATED");
             } else {
                 error_log($log_header . "NO WRITE PERMISSIONES TO FOLDER - logs=[$logs]" );

@@ -1,4 +1,5 @@
-<?php
+<?php 
+namespace book\interfaces;
 
 /**
  * 
@@ -7,9 +8,11 @@
  * Small AddressBook application following Model-Viewer-Controller archetype
  * 
  * @author Cesar Delgado
- * @link http://Ocesar-delgado.info       
+ * @link http://brainit.cesar-delgado.info       
  */
 use Monolog\Logger;
+use Error;
+use Exception;
 
 class AddressBook extends ObjetoWeb 
 {
@@ -34,10 +37,11 @@ class AddressBook extends ObjetoWeb
 
      private function captureURL(){
          $log_header=$this->line_header . __METHOD__ ."()] - ";
+         $success=false;
          try {
              $this->debug($log_header . "CAPTURE URL");
              $this->url=null;
-             if (isset($_GET['url'])) {$this->url=$_GET['url'];}
+             if (isset($_GET['url'])) {$success=true; $this->url=$_GET['url'];}
              
          } catch (Exception $e) {
              $this->treatException($e
@@ -48,6 +52,7 @@ class AddressBook extends ObjetoWeb
                  , $log_header . "CAPTURE URL"
                  );
          }
+         return $success;
      }
 
      private function captureParametersURL(){
@@ -138,22 +143,23 @@ class AddressBook extends ObjetoWeb
              $this->debug($log_header . "TREAT URL");
              
              // 1.- Treat URL
-             $this->captureURL();
-             $properties=$this->decomposeURL($this->url,['controller','command']);
-             
-             // 2.- Treat Parameters
-             $parameters=$this->captureParametersURL();
-             $properties=array_merge($properties, $parameters);
-             
-             // 3.- Set object properties
-             if (!empty($properties)) {
-                 if (!empty($properties['controller'])) {
-                    $this->controllerName=ucwords($properties['controller']);
+             if ($this->captureURL()) {
+                 $properties=$this->decomposeURL($this->url,['controller','command']);
+                 
+                 // 2.- Treat Parameters
+                 $parameters=$this->captureParametersURL();
+                 $properties=array_merge($properties, $parameters);
+                 
+                 // 3.- Set object properties
+                 if (!empty($properties)) {
+                     if (!empty($properties['controller'])) {
+                        $this->controllerName=ucwords($properties['controller']);
+                     }
+                     unset($properties['controller']);
                  }
-                 unset($properties['controller']);
+                 $properties['book']=$this;
+                 $this->controllerProperties=$properties;
              }
-             $properties['book']=$this;
-             $this->controllerProperties=$properties;
              
          } catch (Exception $e) {
              $this->treatException($e
@@ -189,14 +195,15 @@ class AddressBook extends ObjetoWeb
              
              // 1.- Capture URL
              $this->treatURL();
-             
+            
              // 2.- Load Controller
              $this->debug($log_header . "......CONTROLLER NAME [" . $this->controllerName . "]");
-             $this->controller=$this->createClass($this->controllerName,"/../controllers","Index");
+             $this->controller=$this->createClass($this->controllerName,"/../controllers","book\\controllers","Index");
              
              // 4.- Initiate Controller
              if (!($this->controller===false)) {
                  $this->debug($log_header . "CONTROLLER PROPERTIES [" . serialize($this->controllerProperties) . "]");
+                 $this->controller->setLog($this->log);
                  $this->controller->init($this->controllerProperties);
              }
              

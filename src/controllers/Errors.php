@@ -1,12 +1,14 @@
-<?php
+<?php namespace book\controllers;
+
+use book\interfaces\Controller;
+use Monolog\Logger;
+
 
 /**
  *
  * @author cesar
  *        
  */
-use Monolog\Logger;
-
 class Errors extends Controller
 {
 

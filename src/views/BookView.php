@@ -1,5 +1,11 @@
-<?php
+<?php 
+namespace book\views;
+
+use book\interfaces\ObjetoWeb;
+use book\interfaces\View;
 use Monolog\Logger;
+use Exception;
+use Error;
 
 /**
  *

@@ -1,4 +1,5 @@
-<?php
+<?php 
+namespace book\interfaces;
 
 /**
  *
@@ -6,6 +7,8 @@
  *        
  */
 use Monolog\Logger;
+use Error;
+use Exception;
 
 class Controller extends ObjetoWeb
 {
@@ -14,13 +17,36 @@ class Controller extends ObjetoWeb
         * PROPERTIES
         *----------------------------------*/
         // 1.- MVC References
+        /**
+         *  Reference to Caller AddressBook
+         * @var View
+         */
         protected $view;    
+
+        /**
+         *  Reference to Caller AddressBook
+         * @var Model
+         */
         protected $model;
+        
+        /**
+         *  Reference to Caller AddressBook
+         * @var AddressBook
+         */
         protected $book;
         
         
         // 2.- Controller operties
+        /**
+         * Controller Function to call
+         * @var string
+         */
         protected $command; 
+        
+        /**
+         * Parameters of the controller function to call
+         * @var string
+         */
         protected $parameters;
        
         /*----------------------------------
@@ -214,11 +240,11 @@ class Controller extends ObjetoWeb
             
             $log_header=$this->line_header . __METHOD__ ."()] - ";
             $vista=false;
-            $view;
+            $view=false;
             try {
                 
-                if (property_exists($this, $view)) {$view=$this->view;}
-                if(!empty($view)) {
+                if (property_exists($this, 'view')) {$view=$this->view;}
+                if(!($view===false)) {
 
                     $this->debug( $log_header . "  PHP ERRORS [$errorType] / [$errorMsg]");
                     
@@ -290,12 +316,12 @@ class Controller extends ObjetoWeb
                 if (!empty($properties)) {$this->setProperties($properties);}
                 
                 // 2.- Create View
-                $object=$this->createClass($this->clase."View","/../views");
-                if($object===false) { $object=$this->spawnObject("View"); }
+                $object=$this->createClass($this->clase."View","/../views","book\\views");
+                if($object===false) { $object=$this->spawnObject("book\\interfaces\\View"); }
                 $this->view=$object;
                 
                 // 3.- Create Model
-                $object=$this->createClass($this->clase."Model","/../models");
+                $object=$this->createClass($this->clase."Model","/../models","book\\models");
                 if(!($object===false)) { $this->model=$object; }
                
                 // 4.- Dump Controller Properties

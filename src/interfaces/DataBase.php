@@ -1,11 +1,17 @@
-<?php
-use Monolog\Logger;
+<?php 
+namespace book\interfaces;
 
 /**
  *
  * @author Cesar Delgado
  *        
  */
+use Monolog\Logger;
+use Error;
+use Exception;
+use PDOException;
+use PDO;
+
 class DataBase extends ObjetoWeb
 {
  

@@ -1,4 +1,5 @@
-<?php
+<?php 
+namespace book\interfaces;
 
 /**
  *
@@ -6,6 +7,8 @@
  *        
  */
 use Monolog\Logger;
+use Error;
+use Exception;
 
 class Model extends ObjetoWeb
 {
@@ -39,7 +42,7 @@ class Model extends ObjetoWeb
             $this->debug($log_header . "INITIATING MODEL: [" . $this->clase . "]");
                         
             // 1.- Init Connection
-            $object=$this->spawnObject('DataBase');
+            $object=$this->spawnObject(__NAMESPACE__.'\\DataBase');
             $properties['connection']=$object;
 
       

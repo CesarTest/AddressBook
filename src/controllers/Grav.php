@@ -1,4 +1,6 @@
-<?php
+<?php namespace book\controllers;
+
+use book\interfaces\Controller;
 use Monolog\Logger;
 
 /**

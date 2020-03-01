@@ -1,4 +1,4 @@
-<?php
+<?php namespace book\interfaces;
 
 /**
  *
@@ -6,6 +6,9 @@
  *        
  */
 use Monolog\Logger;
+use Error;
+use Exception;
+
 
 class View extends ObjetoWeb
 {

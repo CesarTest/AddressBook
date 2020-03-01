@@ -1,9 +1,14 @@
 <?php 
+namespace book\models;
+
+use book\interfaces\Model;
 use Monolog\Logger;
+use Error;
+use Exception;
 
 /**
  *
- * @author cesar
+ * @author Cesar Delgado
  *        
  */
 class BookModel extends Model
@@ -23,7 +28,6 @@ class BookModel extends Model
     }
     
     public function list() {
-        echo "MODEL - LISTING USERS";
         $log_header=$this->line_header . __METHOD__ ."()] - ";
         $contacts=[[]];
         try {
@@ -54,6 +58,4 @@ class BookModel extends Model
         return $contacts;
         
     }
-    
 }
-
