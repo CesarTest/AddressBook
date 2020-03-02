@@ -6,7 +6,7 @@
  *------------------------------------*/
 
 /* 1.-  User / Database */
-CREATE USER 'addressbook'@'localhost' IDENTIFIED BY 'password';
+CREATE USER 'addressbook'@'localhost' IDENTIFIED BY 'brainit';
 CREATE DATABASE exercise;
 GRANT ALL ON exercise.* TO 'addressbook'@'localhost' IDENTIFIED BY 'brainit';
 FLUSH PRIVILEGES;
