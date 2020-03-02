@@ -61,7 +61,7 @@ class AddressBook extends ObjetoWeb
              }
              
              // 3.- Capture as parameter
-             //if (isset($_GET['url'])) {$success=true; $this->url=$_GET['url'];}
+             if (isset($_GET['url'])) {$success=true; $this->url=$_GET['url'];}
              
              
          } catch (Exception $e) {
