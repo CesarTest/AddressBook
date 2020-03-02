@@ -75,6 +75,7 @@
 			<echo>+ ============================================= </echo>
 	        <delete dir="${logs}" />
 	        <mkdir  dir="${logs}" />
+    		<chmod file="${logs}" mode="0777" verbose="true" />
     </target>
 
     <target name="CleanPhar" depends="init" description="Cleaning log files">

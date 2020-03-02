@@ -2,6 +2,12 @@
 
 RewriteEngine On
 
+## Begin - Redirect HTTPS to HTTP
+RewriteCond %{HTTPS} on
+# or RewriteCond %{SERVER_PORT} ^443$
+RewriteRule ^(.*)$ http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+## End - Redirect HTTPS to HTTP
+
 ## Begin - Index
 # If the requested path and file is not /index.php and the request
 # has not already been internally rewritten to the index.php script
@@ -11,13 +17,8 @@ RewriteCond %{REQUEST_FILENAME} !-f
 # and the requested path and file doesn't directly match a physical folder
 RewriteCond %{REQUEST_FILENAME} !-d
 # internally rewrite the request to the index.php script
-RewriteRule .* index.php [L]
+	RewriteRule .* index.php [L]
 ## End - Index
 
-## Begin - Redirect HTTPS to HTTP
-RewriteCond %{HTTPS} on
-# or RewriteCond %{SERVER_PORT} ^443$
-RewriteRule .? http://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-## End - Redirect HTTPS to HTTP
 
 </IfModule>

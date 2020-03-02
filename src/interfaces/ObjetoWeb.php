@@ -2,6 +2,7 @@
 namespace book\interfaces;
 
 /**
+ *  Encapsulate Logging System
  *
  * @author Cesar Delgado
  *        
@@ -173,10 +174,10 @@ class ObjetoWeb
         //-------------------
         return $object;
     }
-      
+
     /**
-     *
-     * @param string $json
+     * 
+     * @param array $input
      */
     protected function setProperties(array $input=null){
         
