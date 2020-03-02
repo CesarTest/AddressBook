@@ -7,11 +7,11 @@ namespace book\interfaces;
  * @author Cesar Delgado
  *        
  */
+use Doctrine\Instantiator\Exception\UnexpectedValueException;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 use Error;
 use Exception;
-use book;
 
 class ObjetoWeb
 {
@@ -518,13 +518,17 @@ class ObjetoWeb
              *            ACTIONS
              *----------------------------------*/
             $log = new Logger($name);
-            if ( ($permission & 0x0080) | ($permission & 0x0002)) {
+            if ($permission & 0x0002) {
+                error_log($log_header . "WRITE PERMISSIONES TO FOLDER: [$logs]");
                 $log->pushHandler(new StreamHandler($logfile, Logger::DEBUG));
                 $log->addDebug($log_header . "LOGGING SYSTEM CORRECTLY INITIATED");
             } else {
                 error_log($log_header . "NO WRITE PERMISSIONES TO FOLDER - logs=[$logs]" );
             }
             
+        } catch (UnexpectedValueException $e) {
+            error_log($log_header . "LOGGING SYSTEM INITIATION FAILED:" . $e->getMessage());
+            error_log($e->getTraceAsString());
         } catch (Error $e) {
             error_log($log_header . "LOGGING SYSTEM INITIATION FAILED:" . $e->getMessage());
             error_log($e->getTraceAsString());
